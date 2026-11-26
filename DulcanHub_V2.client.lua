@@ -1,5 +1,5 @@
--- DULCAN HUB V2.7 | LocalScript | standalone UI
-local VERSION = "2.7.0"
+-- DULCAN HUB V2.8 | LocalScript | standalone UI
+local VERSION = "2.8.0"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -270,122 +270,186 @@ round(avatar,5); stroke(avatar,.65)
 label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),12,C.text,Enum.Font.GothamMedium)
 label(profile,"@"..player.Name,UDim2.fromOffset(42,21),UDim2.new(1,-44,0,13),10,C.muted)
 
--- Native navigation framework. No game-specific functionality.
+-- Settings only: two compact panels, no game-specific functions.
+local toggleKey=Enum.KeyCode.RightShift
+local capturingKey=false
+local blurEnabled=false
+local blurEffect
+local renderChanged=false
+local oldQuality
+local oldFPS
+local fpsLimit=60
+local capEnabled=false
+local function restoreSettings()
+    if blurEffect then blurEffect:Destroy(); blurEffect=nil end
+    if renderChanged then pcall(function() RunService:Set3dRenderingEnabled(true) end) end
+    if oldQuality~=nil then pcall(function() UserSettings():GetService("UserGameSettings").SavedQualityLevel=oldQuality end) end
+    if capEnabled and oldFPS~=nil and type(setfpscap)=="function" then pcall(setfpscap,oldFPS) end
+end
+on(gui.Destroying,restoreSettings)
+
+local selected=make("TextButton",nav,{Name="Settings",Size=UDim2.new(1,-2,0,35),
+    BackgroundColor3=C.surface,BackgroundTransparency=.38,Text="",AutoButtonColor=false,BorderSizePixel=0})
+round(selected,6); stroke(selected,.72)
+local gear=label(selected,"⚙",UDim2.fromOffset(11,0),UDim2.fromOffset(24,35),19,C.accent)
+gear.Font=Enum.Font.Gotham
+label(selected,"Settings",UDim2.fromOffset(40,0),UDim2.new(1,-45,1,0),13,C.text)
+local heading=label(header,"Settings",UDim2.fromOffset(242,6),UDim2.new(1,-390,0,48),14,C.text,Enum.Font.GothamMedium)
+heading.ZIndex=2
 content.ClipsDescendants=true
-local tabs,activeTab={},nil
-local function navIcon(parent,kind)
-    local holder=frame(parent,"Icon",UDim2.fromOffset(12,8),UDim2.fromOffset(18,18),C.dark,1)
-    local parts={}
-    local function mark(x,y,w,h,rotation,radius)
-        local p=frame(holder,"Mark",UDim2.fromOffset(x,y),UDim2.fromOffset(w,h),C.muted,0)
-        p.Rotation=rotation or 0
-        if radius then round(p,radius) end
-        parts[#parts+1]={object=p,property="BackgroundColor3"}
-        return p
-    end
-    local function outline(x,y,w,h,radius)
-        local p=frame(holder,"Outline",UDim2.fromOffset(x,y),UDim2.fromOffset(w,h),C.dark,1)
-        round(p,radius)
-        local edge=make("UIStroke",p,{Color=C.muted,Thickness=1.25,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
-        parts[#parts+1]={object=edge,property="Color"}
-        return p
-    end
-    if kind=="Home" then
-        mark(1,5,10,1.5,-45,1); mark(8,5,10,1.5,45,1)
-        outline(4,8,10,9,2)
-    elseif kind=="Components" then
-        for y=0,1 do for x=0,1 do outline(2+x*8,2+y*8,5,5,1) end end
-    elseif kind=="Settings" then
-        outline(4,4,10,10,5)
-        outline(7,7,4,4,2)
-        for _,p in ipairs({{8,1,2,3},{8,14,2,3},{1,8,3,2},{14,8,3,2}}) do
-            mark(p[1],p[2],p[3],p[4],0,1)
-        end
+local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromScale(1,1),
+    CanvasSize=UDim2.fromOffset(0,0),BackgroundTransparency=1,BorderSizePixel=0,
+    ScrollBarThickness=3,ScrollBarImageColor3=C.muted,ScrollingDirection=Enum.ScrollingDirection.Y})
+local function panel(name,height)
+    local p=frame(scroll,name,UDim2.fromOffset(0,0),UDim2.fromOffset(250,height),C.surface,.72)
+    round(p,7); stroke(p,.65)
+    label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),13,C.text,Enum.Font.GothamBold)
+    return p
+end
+local performance=panel("Performance",201)
+local interface=panel("Interface",148)
+local notice=label(scroll,"",UDim2.fromOffset(4,211),UDim2.new(1,-8,0,32),11,C.muted)
+notice.TextWrapped=true; notice.TextTruncate=Enum.TextTruncate.None
+local function feedback(message)
+    notice.Text=message or ""
+end
+local function layoutPanels()
+    local width=math.max(1,scroll.AbsoluteSize.X-5)
+    if width>=420 then
+        local half=math.floor((width-6)/2)
+        performance.Position=UDim2.fromOffset(0,1)
+        performance.Size=UDim2.fromOffset(half,201)
+        interface.Position=UDim2.fromOffset(half+6,1)
+        interface.Size=UDim2.fromOffset(width-half-6,148)
+        notice.Position=UDim2.fromOffset(4,209)
+        scroll.CanvasSize=UDim2.fromOffset(0,244)
     else
-        outline(2,2,14,14,7)
-        mark(8,5,2,2,0,1); mark(8,9,2,5,0,1)
+        performance.Position=UDim2.fromOffset(0,1)
+        performance.Size=UDim2.fromOffset(width,201)
+        interface.Position=UDim2.fromOffset(0,208)
+        interface.Size=UDim2.fromOffset(width,148)
+        notice.Position=UDim2.fromOffset(4,363)
+        scroll.CanvasSize=UDim2.fromOffset(0,400)
     end
-    return parts
 end
-local function section(parent,caption,order)
-    local l=label(parent,caption,UDim2.fromOffset(0,0),UDim2.new(1,0,0,24),10,C.muted,Enum.Font.GothamMedium)
-    l.LayoutOrder=order
-    make("UIPadding",l,{PaddingLeft=UDim.new(0,10)})
+on(scroll:GetPropertyChangedSignal("AbsoluteSize"),layoutPanels)
+layoutPanels()
+local function row(p,name,y)
+    local r=frame(p,name,UDim2.fromOffset(10,y),UDim2.new(1,-20,0,35),C.dark,1)
+    label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),12,C.text)
+    return r
 end
-local function selectTab(tab)
-    if activeTab==tab then return end
-    activeTab=tab
-    for _,entry in ipairs(tabs) do
-        local selected=entry==tab
-        entry.page.Visible=selected
-        entry.indicator.Visible=selected
-        tween(entry.button,{BackgroundTransparency=selected and .74 or 1},.16)
-        tween(entry.caption,{TextColor3=selected and C.text or C.muted},.16)
-        for _,part in ipairs(entry.icon) do
-            tween(part.object,{[part.property]=selected and C.accent or C.muted},.16)
+local function toggle(p,name,y,callback)
+    local r=row(p,name,y)
+    local b=make("TextButton",r,{Name="Toggle",AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
+        Size=UDim2.fromOffset(35,21),BackgroundColor3=C.surface,BackgroundTransparency=.15,Text="",BorderSizePixel=0,AutoButtonColor=false})
+    round(b,11); stroke(b,.60)
+    local knob=frame(b,"Knob",UDim2.fromOffset(3,3),UDim2.fromOffset(15,15),C.muted,0)
+    round(knob,8)
+    local state=false
+    on(b.Activated,function()
+        local nextState=not state
+        local ok,result,message=pcall(callback,nextState)
+        if not ok or result==false then
+            feedback(message or (name.." is not available in this client."))
+            return
         end
+        state=nextState
+        feedback("")
+        tween(b,{BackgroundColor3=state and C.accent or C.surface},.15)
+        tween(knob,{Position=UDim2.fromOffset(state and 17 or 3,3),BackgroundColor3=state and C.text or C.muted},.15)
+    end)
+end
+toggle(performance,"Disable 3D Rendering",35,function(enabled)
+    RunService:Set3dRenderingEnabled(not enabled)
+    renderChanged=enabled
+    return true
+end)
+toggle(performance,"Low Graphics",70,function(enabled)
+    local settings=UserSettings():GetService("UserGameSettings")
+    if enabled then
+        local prior=settings.SavedQualityLevel
+        settings.SavedQualityLevel=Enum.SavedQualitySetting.QualityLevel1
+        oldQuality=prior
+    elseif oldQuality~=nil then
+        settings.SavedQualityLevel=oldQuality
+        oldQuality=nil
     end
-    if tab.transition then tab.transition:Cancel() end
-    tab.inner.Position=UDim2.fromOffset(0,5)
-    tab.transition=tween(tab.inner,{Position=UDim2.fromOffset(0,0)},.20)
+    return true
+end)
+toggle(performance,"FPS Cap",105,function(enabled)
+    if type(setfpscap)~="function" or type(getfpscap)~="function" then
+        return false,"FPS Cap is not available here. Use Roblox graphics settings."
+    end
+    if enabled then
+        local prior=getfpscap()
+        if type(prior)~="number" then return false,"Could not read the original FPS limit." end
+        setfpscap(fpsLimit)
+        oldFPS=prior; capEnabled=true
+    else
+        setfpscap(oldFPS)
+        oldFPS=nil; capEnabled=false
+    end
+    return true
+end)
+local sliderLabel=label(performance,"FPS Limit",UDim2.fromOffset(13,144),UDim2.new(1,-72,0,21),12,C.text)
+local value=label(performance,"60",UDim2.new(1,-66,0,144),UDim2.fromOffset(53,21),12,C.muted)
+value.TextXAlignment=Enum.TextXAlignment.Right
+local slider=frame(performance,"Slider",UDim2.fromOffset(13,174),UDim2.new(1,-26,0,6),C.surface,.05)
+round(slider,4); stroke(slider,.7)
+local fill=frame(slider,"Fill",UDim2.fromOffset(0,0),UDim2.fromScale(30/210,1),C.accent,0); round(fill,4)
+local thumb=frame(slider,"Thumb",UDim2.fromScale(30/210,.5),UDim2.fromOffset(13,13),C.text,0)
+thumb.AnchorPoint=Vector2.new(.5,.5); round(thumb,7)
+local hit=make("TextButton",slider,{Name="Hit",Position=UDim2.fromOffset(0,-8),Size=UDim2.new(1,0,0,22),
+    BackgroundTransparency=1,Text="",AutoButtonColor=false})
+local sliding
+local function sliderAt(x)
+    local ratio=math.clamp((x-slider.AbsolutePosition.X)/math.max(1,slider.AbsoluteSize.X),0,1)
+    local n=math.clamp(math.floor((30+ratio*210)/5+.5)*5,30,240)
+    if capEnabled then
+        local ok=pcall(setfpscap,n)
+        if not ok then feedback("Unable to change the FPS limit."); return end
+    end
+    fpsLimit=n; value.Text=tostring(n)
+    local t=(n-30)/210
+    fill.Size=UDim2.fromScale(t,1); thumb.Position=UDim2.fromScale(t,.5)
 end
-local function addTab(name,description,order)
-    local b=make("TextButton",nav,{Name=name,Size=UDim2.new(1,-2,0,34),
-        BackgroundColor3=C.accent,BackgroundTransparency=1,BorderSizePixel=0,
-        Text="",AutoButtonColor=false,LayoutOrder=order})
-    round(b,6)
-    local indicator=frame(b,"Selected",UDim2.fromOffset(0,7),UDim2.fromOffset(3,20),C.accent,0)
-    round(indicator,2); indicator.Visible=false
-    local caption=label(b,name,UDim2.fromOffset(40,0),UDim2.new(1,-46,1,0),13,C.muted)
-    local icon=navIcon(b,name)
-    local page=make("ScrollingFrame",content,{Name=name.."Page",Size=UDim2.fromScale(1,1),
-        BackgroundTransparency=1,BorderSizePixel=0,Visible=false,
-        CanvasSize=UDim2.fromOffset(0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,
-        ScrollBarThickness=3,ScrollBarImageColor3=C.muted,ScrollingDirection=Enum.ScrollingDirection.Y})
-    local inner=frame(page,"PageContent",UDim2.fromOffset(0,0),UDim2.new(1,-8,0,0),C.dark,1)
-    inner.AutomaticSize=Enum.AutomaticSize.Y
-    make("UIListLayout",inner,{Padding=UDim.new(0,8),SortOrder=Enum.SortOrder.LayoutOrder})
-    make("UIPadding",inner,{PaddingLeft=UDim.new(0,8),PaddingRight=UDim.new(0,8),PaddingTop=UDim.new(0,5),PaddingBottom=UDim.new(0,10)})
-    local heading=frame(inner,"Heading",UDim2.fromOffset(0,0),UDim2.new(1,0,0,48),C.dark,1)
-    heading.LayoutOrder=1
-    label(heading,name,UDim2.fromOffset(0,0),UDim2.new(1,0,0,27),21,C.text,Enum.Font.GothamBold)
-    label(heading,description,UDim2.fromOffset(0,28),UDim2.new(1,0,0,17),11,C.muted)
-    local entry={button=b,caption=caption,indicator=indicator,icon=icon,page=page,inner=inner}
-    tabs[#tabs+1]=entry
-    on(b.Activated,function() selectTab(entry) end)
-    on(b.MouseEnter,function()
-        if activeTab~=entry then tween(b,{BackgroundTransparency=.90},.12) end
-    end)
-    on(b.MouseLeave,function()
-        if activeTab~=entry then tween(b,{BackgroundTransparency=1},.12) end
-    end)
-    return inner,entry
+on(hit.InputBegan,function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+        sliding=i; sliderAt(i.Position.X)
+    end
+end)
+on(UIS.InputChanged,function(i)
+    if not sliding then return end
+    if i==sliding or (sliding.UserInputType==Enum.UserInputType.MouseButton1 and i.UserInputType==Enum.UserInputType.MouseMovement) then sliderAt(i.Position.X) end
+end)
+on(UIS.InputEnded,function(i) if i==sliding then sliding=nil end end)
+local function applyBlur(visible)
+    if not blurEffect then return end
+    blurEffect.Enabled=blurEnabled and visible
 end
-local function infoCard(parent,name,body,order)
-    local card=frame(parent,"InfoCard",UDim2.fromOffset(0,0),UDim2.new(1,0,0,73),C.surface,.66)
-    card.LayoutOrder=order; round(card,7); stroke(card,.70)
-    label(card,name,UDim2.fromOffset(12,9),UDim2.new(1,-24,0,20),13,C.text,Enum.Font.GothamBold)
-    local desc=label(card,body,UDim2.fromOffset(12,32),UDim2.new(1,-24,0,31),12,C.muted)
-    desc.TextWrapped=true; desc.TextTruncate=Enum.TextTruncate.None
-    desc.TextYAlignment=Enum.TextYAlignment.Top
-    return card
-end
-section(nav,"GENERAL",1)
-local home,homeTab=addTab("Home","Welcome to Dulcan Hub.",2)
-local versionCard=frame(home,"VersionCard",UDim2.fromOffset(0,0),UDim2.new(1,0,0,89),C.surface,.66)
-versionCard.LayoutOrder=2; round(versionCard,7); stroke(versionCard,.62)
-label(versionCard,"CURRENT VERSION",UDim2.fromOffset(13,9),UDim2.new(1,-26,0,17),10,C.muted)
-label(versionCard,VERSION,UDim2.fromOffset(13,26),UDim2.new(1,-26,0,34),27,C.accent,Enum.Font.GothamBold)
-label(versionCard,"Universal Interface",UDim2.fromOffset(13,63),UDim2.new(1,-26,0,16),11,C.text)
-infoCard(home,"Official repository","thedulcandesign / DULCAN-HUB",3)
-local components=addTab("Components","Interface components.",3)
-infoCard(components,"Coming soon","This page is reserved for interface components.",2)
-local settings=addTab("Settings","Interface preferences.",4)
-infoCard(settings,"Coming soon","Interface settings will be added in a future update.",2)
-local about=addTab("About","Information about Dulcan Hub.",5)
-infoCard(about,"Dulcan Hub","Universal Interface  |  v"..VERSION,2)
-infoCard(about,"Developer","Dulcan Design",3)
-selectTab(homeTab)
+toggle(interface,"Background Blur",35,function(enabled)
+    if enabled and not blurEffect then
+        blurEffect=make("BlurEffect",game:GetService("Lighting"),{Name="DulcanHubBlur",Size=12,Enabled=true})
+    end
+    blurEnabled=enabled; applyBlur(window.Visible)
+    return true
+end)
+local keyRow=row(interface,"Toggle Key",70)
+local keyButton=make("TextButton",keyRow,{AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
+    Size=UDim2.fromOffset(68,24),BackgroundColor3=C.surface,BackgroundTransparency=.18,Text="RShift",
+    TextColor3=C.muted,Font=Enum.Font.GothamMedium,TextSize=11,BorderSizePixel=0,AutoButtonColor=false})
+round(keyButton,5); stroke(keyButton,.65)
+on(keyButton.Activated,function()
+    capturingKey=not capturingKey
+    keyButton.Text=capturingKey and "Press key" or (toggleKey==Enum.KeyCode.RightShift and "RShift" or toggleKey.Name)
+end)
+local unload=make("TextButton",interface,{Name="UnloadHub",Position=UDim2.fromOffset(9,109),Size=UDim2.new(1,-18,0,30),
+    Text="",BackgroundColor3=C.surface,BackgroundTransparency=.73,BorderSizePixel=0,AutoButtonColor=false})
+round(unload,5); stroke(unload,.76)
+label(unload,"Unload Hub",UDim2.fromOffset(5,0),UDim2.new(1,-35,1,0),12,C.text)
+local arrow=label(unload,"›",UDim2.new(1,-22,0,0),UDim2.fromOffset(16,30),18,C.muted)
+on(unload.Activated,function() gui:Destroy() end)
 
 -- Compact independent status bar (actual measured values).
 local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,12),UDim2.fromOffset(470,35),C.purple,.10)
@@ -495,6 +559,7 @@ local open=true
 local animation
 local function setOpen(state)
     open=state; slash.Visible=not state
+    applyBlur(state)
     if animation then animation:Cancel() end
     if state then window.Visible=true end
     animation=tween(window,{GroupTransparency=state and 0 or 1},.22)
@@ -507,7 +572,13 @@ on(minimize.Activated,function() setOpen(false) end)
 on(eye.Activated,function() setOpen(not open) end)
 on(close.Activated,function() gui:Destroy() end)
 on(UIS.InputBegan,function(i,processed)
-    if not processed and not UIS:GetFocusedTextBox() and i.KeyCode==Enum.KeyCode.RightShift then setOpen(not open) end
+    if capturingKey and i.UserInputType==Enum.UserInputType.Keyboard then
+        capturingKey=false
+        if i.KeyCode~=Enum.KeyCode.Escape and i.KeyCode~=Enum.KeyCode.Unknown then toggleKey=i.KeyCode end
+        keyButton.Text=toggleKey==Enum.KeyCode.RightShift and "RShift" or toggleKey.Name
+        return
+    end
+    if not processed and not UIS:GetFocusedTextBox() and i.KeyCode==toggleKey then setOpen(not open) end
 end)
 local frames,elapsed=0,0
 on(RunService.RenderStepped,function(dt)
