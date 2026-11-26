@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8.4 | LocalScript | standalone UI
-local VERSION = "2.8.4"
+-- DULCAN HUB V2.8.5 | LocalScript | standalone UI
+local VERSION = "2.8.5"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -325,7 +325,7 @@ local function feedback(message)
     notice.Text=message or ""
 end
 local function layoutPanels()
-    local width=math.max(1,scroll.AbsoluteSize.X-5)
+    local width=math.max(1,scroll.AbsoluteSize.X/math.max(scale.Scale,.001)-5)
     if width>=420 then
         local half=math.floor((width-6)/2)
         performance.Position=UDim2.fromOffset(0,1)
@@ -344,6 +344,7 @@ local function layoutPanels()
     end
 end
 on(scroll:GetPropertyChangedSignal("AbsoluteSize"),layoutPanels)
+on(scale:GetPropertyChangedSignal("Scale"),layoutPanels)
 layoutPanels()
 local function row(p,name,y)
     local r=frame(p,name,UDim2.fromOffset(10,y),UDim2.new(1,-20,0,35),C.dark,1)
@@ -463,8 +464,9 @@ local arrow=label(unload,"›",UDim2.new(1,-22,0,0),UDim2.fromOffset(16,30),18,C
 on(unload.Activated,function() gui:Destroy() end)
 
 -- Compact independent status bar (actual measured values).
-local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,12),UDim2.fromOffset(470,35),C.purple,.10)
-bar.AnchorPoint=Vector2.new(1,0); round(bar,7); stroke(bar,.55)
+local BAR_WIDTH=540
+local bar=frame(root,"StatusBar",UDim2.new(1,-12-BAR_WIDTH,0,12),UDim2.fromOffset(BAR_WIDTH,35),C.purple,.10)
+bar.AnchorPoint=Vector2.new(0,0); round(bar,7); stroke(bar,.55)
 local barScale=make("UIScale",bar,{Scale=1})
 make("UIGradient",bar,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(145,135,157)),Rotation=90})
 local fallbackBarLogo=logo(bar,8,5,23)
@@ -479,8 +481,10 @@ local smallAvatar=make("ImageLabel",bar,{Position=UDim2.fromOffset(172,9),Size=U
     BackgroundColor3=C.surface,BackgroundTransparency=.25,BorderSizePixel=0})
 round(smallAvatar,4)
 label(bar,"@"..player.Name,UDim2.fromOffset(195,0),UDim2.fromOffset(82,35),10,C.muted)
-local experience=label(bar,game.Name,UDim2.fromOffset(291,0),UDim2.fromOffset(140,35),10,C.muted)
-local eye=button(bar,"ToggleWindow","",UDim2.fromOffset(437,4),UDim2.fromOffset(27,27))
+local experience=label(bar,game.Name,UDim2.fromOffset(291,0),UDim2.fromOffset(BAR_WIDTH-330,35),10,C.muted)
+experience.TextScaled=true
+make("UITextSizeConstraint",experience,{MinTextSize=8,MaxTextSize=10})
+local eye=button(bar,"ToggleWindow","",UDim2.fromOffset(BAR_WIDTH-33,4),UDim2.fromOffset(27,27))
 local eyeShape=frame(eye,"Eye",UDim2.fromOffset(5,8),UDim2.fromOffset(17,11),C.dark,1)
 round(eyeShape,8); stroke(eyeShape,.22)
 local pupil=frame(eyeShape,"Pupil",UDim2.fromOffset(6,3),UDim2.fromOffset(5,5),C.muted,0)
@@ -523,7 +527,9 @@ local function layout()
     local v=root.AbsoluteSize
     if v.X<32 or v.Y<32 then return end
     scale.Scale=math.min(1,(v.X-24)/w,(v.Y-24)/h)
-    barScale.Scale=math.min(1,(v.X-24)/470)
+    local statusScale=math.min(1,(v.X-24)/BAR_WIDTH)
+    barScale.Scale=statusScale
+    bar.Position=UDim2.fromOffset(math.max(0,math.floor(v.X-12-BAR_WIDTH*statusScale)),12)
     window.Size=UDim2.fromOffset(w,h)
     local actual=Vector2.new(w,h)*scale.Scale
     local x,y=window.Position.X.Offset,window.Position.Y.Offset
