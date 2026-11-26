@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8.8 | LocalScript | standalone UI
-local VERSION = "2.8.8"
+-- DULCAN HUB V2.8.9 | LocalScript | standalone UI
+local VERSION = "2.8.9"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -21,7 +21,7 @@ local C = {
 local UI_FONT_FAMILY = "rbxasset://fonts/families/GothamSSm.json"
 local UI_FONTS = {
     Regular = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-    Medium = Font.new(UI_FONT_FAMILY, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+    Medium = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Medium, Enum.FontStyle.Normal),
     SemiBold = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 }
 local function make(class, parent, props)
@@ -235,20 +235,20 @@ local window=make("CanvasGroup",root,{Name="MainWindow",Size=UDim2.fromOffset(w,
     BackgroundTransparency=1,GroupTransparency=1,BorderSizePixel=0,ClipsDescendants=true})
 round(window,10)
 local scale=make("UIScale",window,{Scale=1})
-local bg=frame(window,"Glass",UDim2.fromOffset(0,0),UDim2.fromScale(1,1),Color3.new(1,1,1),.07)
+local bg=frame(window,"AcrylicTint",UDim2.fromOffset(0,0),UDim2.fromScale(1,1),Color3.new(1,1,1),.13)
 round(bg,10); stroke(bg,.68)
 make("UIGradient",bg,{Color=ColorSequence.new({
-    ColorSequenceKeypoint.new(0,C.purple),ColorSequenceKeypoint.new(.45,Color3.fromRGB(23,22,30)),
+    ColorSequenceKeypoint.new(0,Color3.fromRGB(33,31,42)),ColorSequenceKeypoint.new(.45,Color3.fromRGB(23,24,29)),
     ColorSequenceKeypoint.new(1,C.dark)}),Rotation=90})
-local header=frame(window,"Header",UDim2.fromOffset(0,0),UDim2.new(1,0,0,66),C.dark,1)
+local header=frame(window,"Header",UDim2.fromOffset(0,0),UDim2.new(1,0,0,48),C.dark,1)
 local drag=frame(header,"DragArea",UDim2.fromOffset(0,0),UDim2.new(1,-76,1,0),C.dark,1)
 drag.Active=true
 local fallbackLogo=logo(drag,13,8,29)
-local brandOK,brandImage=pcall(rasterLogo,drag,"OfficialBrand",UDim2.fromOffset(7,1),UDim2.fromOffset(192,64),false)
+local brandOK,brandImage=pcall(rasterLogo,drag,"OfficialBrand",UDim2.fromOffset(9,1),UDim2.fromOffset(138,46),false)
 local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),15,C.text,UI_FONTS.SemiBold)
 title.RichText=true
 local subtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(51,25),UDim2.fromOffset(200,14),11,C.text,UI_FONTS.Medium)
-local brandSubtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(83,44),UDim2.fromOffset(143,15),11,Color3.fromRGB(232,224,243),UI_FONTS.Medium)
+local brandSubtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(64,31),UDim2.fromOffset(121,14),10,Color3.fromRGB(232,224,243),UI_FONTS.Medium)
 brandSubtitle.Name="OfficialBrandSubtitle"
 brandSubtitle.TextTruncate=Enum.TextTruncate.None
 brandSubtitle.ZIndex=3
@@ -257,23 +257,89 @@ local version=label(header,"v"..VERSION,UDim2.new(1,-132,0,11),UDim2.fromOffset(
 version.TextXAlignment=Enum.TextXAlignment.Center
 local minimize=button(header,"Minimize","",UDim2.new(1,-65,0,8),UDim2.fromOffset(28,28))
 local close=button(header,"Close","",UDim2.new(1,-34,0,8),UDim2.fromOffset(27,28),Color3.fromRGB(134,44,62))
-local function iconLine(parent,rotation,length)
-    local line=frame(parent,"IconLine",UDim2.fromScale(.5,.5),UDim2.fromOffset(length,1.5),C.muted,0)
-    line.AnchorPoint=Vector2.new(.5,.5); line.Rotation=rotation; round(line,1)
-    return line
-end
-iconLine(minimize,0,11)
-iconLine(close,45,12); iconLine(close,-45,12)
+-- Lucide paths adapted into native Roblox strokes. Source: https://github.com/lucide-icons/lucide
+--[[
+ISC License
 
-local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,66),UDim2.new(0,176,1,-73),C.surface,.77)
+Copyright (c) 2026 Lucide Icons and Contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+---
+
+The following Lucide icons are derived from the Feather project:
+
+airplay, alert-circle, alert-octagon, alert-triangle, aperture, arrow-down-circle, arrow-down-left, arrow-down-right, arrow-down, arrow-left-circle, arrow-left, arrow-right-circle, arrow-right, arrow-up-circle, arrow-up-left, arrow-up-right, arrow-up, at-sign, calendar, cast, check, chevron-down, chevron-left, chevron-right, chevron-up, chevrons-down, chevrons-left, chevrons-right, chevrons-up, circle, clipboard, clock, code, columns, command, compass, corner-down-left, corner-down-right, corner-left-down, corner-left-up, corner-right-down, corner-right-up, corner-up-left, corner-up-right, crosshair, database, divide-circle, divide-square, dollar-sign, download, external-link, feather, frown, hash, headphones, help-circle, info, italic, key, layout, life-buoy, link-2, link, loader, lock, log-in, log-out, maximize, meh, minimize, minimize-2, minus-circle, minus-square, minus, monitor, moon, more-horizontal, more-vertical, move, music, navigation-2, navigation, octagon, pause-circle, percent, plus-circle, plus-square, plus, power, radio, rss, search, server, share, shopping-bag, sidebar, smartphone, smile, square, table-2, tablet, target, terminal, trash-2, trash, triangle, tv, type, upload, x-circle, x-octagon, x-square, x, zoom-in, zoom-out
+
+The MIT License (MIT) (for the icons listed above)
+
+Copyright (c) 2013-present Cole Bemis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+]]
+local iconPaths={
+    Settings={{{9.671,4.136},{9.966,3.202},{10.617,2.470},{11.511,2.069},{12.490,2.069},{13.384,2.470},{14.035,3.202},{14.330,4.136},{14.577,4.994},{15.126,5.697},{15.899,6.142},{16.783,6.267},{17.649,6.051},{18.604,5.842},{19.561,6.041},{20.353,6.614},{20.842,7.460},{20.943,8.433},{20.637,9.361},{19.979,10.084},{19.360,10.726},{19.026,11.553},{19.026,12.446},{19.360,13.273},{19.979,13.915},{20.637,14.638},{20.943,15.566},{20.842,16.539},{20.353,17.385},{19.561,17.958},{18.604,18.157},{17.649,17.948},{16.783,17.732},{15.899,17.857},{15.126,18.302},{14.577,19.005},{14.330,19.863},{14.035,20.797},{13.384,21.529},{12.490,21.930},{11.511,21.930},{10.617,21.529},{9.966,20.797},{9.671,19.863},{9.424,19.005},{8.874,18.302},{8.101,17.856},{7.217,17.732},{6.351,17.948},{5.396,18.157},{4.439,17.958},{3.647,17.385},{3.158,16.539},{3.057,15.566},{3.363,14.638},{4.021,13.915},{4.640,13.273},{4.974,12.446},{4.974,11.553},{4.640,10.726},{4.021,10.084},{3.363,9.361},{3.057,8.433},{3.158,7.460},{3.647,6.614},{4.439,6.041},{5.396,5.842},{6.351,6.051},{7.217,6.267},{8.101,6.142},{8.874,5.697},{9.423,4.994},{9.670,4.136}},{{15.000,12.000},{14.772,13.148},{14.121,14.121},{13.148,14.772},{12.000,15.000},{10.852,14.772},{9.879,14.121},{9.228,13.148},{9.000,12.000},{9.228,10.852},{9.879,9.879},{10.852,9.228},{12.000,9.000},{13.148,9.228},{14.121,9.879},{14.772,10.852},{15.000,12.000}}},
+    ChevronRight={{{9,18},{15,12},{9,6}}},
+    Minus={{{5,12},{19,12}}},
+    Close={{{18,6},{6,18}},{{6,6},{18,18}}}
+}
+local function lucideIcon(parent,name,pos,px,color)
+    local icon=frame(parent,name,pos,UDim2.fromOffset(px,px),C.dark,1)
+    icon.AnchorPoint=Vector2.new(.5,.5)
+    local thickness=math.max(1,px*2/24)
+    for _,path in ipairs(iconPaths[name]) do
+        for i=2,#path do
+            local p,q=path[i-1],path[i]
+            local ax,ay,bx,by=p[1]*px/24,p[2]*px/24,q[1]*px/24,q[2]*px/24
+            local dx,dy=bx-ax,by-ay
+            local line=frame(icon,"Stroke",UDim2.fromOffset((ax+bx)/2,(ay+by)/2),
+                UDim2.fromOffset(math.sqrt(dx*dx+dy*dy)+thickness,thickness),color,0)
+            line.AnchorPoint=Vector2.new(.5,.5); line.Rotation=math.deg(math.atan2(dy,dx)); round(line,2)
+        end
+    end
+    return icon
+end
+
+lucideIcon(minimize,"Minus",UDim2.fromScale(.5,.5),14,C.muted)
+lucideIcon(close,"Close",UDim2.fromScale(.5,.5),14,C.muted)
+
+local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,48),UDim2.new(0,177,1,-55),C.surface,.77)
 round(sidebar,7); stroke(sidebar,.72)
-local nav=make("ScrollingFrame",sidebar,{Name="Navigation",Position=UDim2.fromOffset(6,6),
-    Size=UDim2.new(1,-12,1,-59),BackgroundTransparency=1,BorderSizePixel=0,
+local nav=make("ScrollingFrame",sidebar,{Name="Navigation",Position=UDim2.fromOffset(0,0),
+    Size=UDim2.new(1,0,1,-53),BackgroundTransparency=1,BorderSizePixel=0,
     CanvasSize=UDim2.fromOffset(0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,
     ScrollingDirection=Enum.ScrollingDirection.Y,ScrollBarThickness=2,
     ScrollBarImageColor3=C.muted,ClipsDescendants=true})
-make("UIListLayout",nav,{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder})
-local content=frame(window,"Content",UDim2.fromOffset(190,66),UDim2.new(1,-197,1,-73),C.dark,1)
+make("UIPadding",nav,{PaddingTop=UDim.new(0,6),PaddingLeft=UDim.new(0,6),PaddingRight=UDim.new(0,6)})
+make("UIListLayout",nav,{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder,HorizontalAlignment=Enum.HorizontalAlignment.Center})
+local content=frame(window,"Content",UDim2.fromOffset(190,48),UDim2.new(1,-197,1,-55),C.dark,1)
 local profile=frame(sidebar,"Profile",UDim2.new(0,6,1,-47),UDim2.new(1,-12,0,41),C.dark,1)
 local avatar=make("ImageLabel",profile,{Name="Avatar",Position=UDim2.fromOffset(3,4),Size=UDim2.fromOffset(31,31),
     BackgroundColor3=C.surface,BackgroundTransparency=.35,BorderSizePixel=0,ScaleType=Enum.ScaleType.Crop})
@@ -299,24 +365,12 @@ local function restoreSettings()
 end
 on(gui.Destroying,restoreSettings)
 
-local selected=make("TextButton",nav,{Name="Settings",Size=UDim2.new(1,-2,0,35),
-    BackgroundColor3=C.surface,BackgroundTransparency=.38,Text="",AutoButtonColor=false,BorderSizePixel=0})
+local selected=make("TextButton",nav,{Name="Settings",Size=UDim2.new(1,0,0,35),
+    BackgroundColor3=C.surface,BackgroundTransparency=.60,Text="",AutoButtonColor=false,BorderSizePixel=0})
 round(selected,6); stroke(selected,.72)
-local gear=frame(selected,"SettingsIcon",UDim2.fromOffset(13,17.5),UDim2.fromOffset(18,18),C.dark,1)
-gear.AnchorPoint=Vector2.new(0,.5)
-local gearRing=frame(gear,"Ring",UDim2.fromScale(.5,.5),UDim2.fromOffset(11,11),C.dark,1)
-gearRing.AnchorPoint=Vector2.new(.5,.5); round(gearRing,6)
-make("UIStroke",gearRing,{Color=C.accent,Thickness=1.3,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
-local gearCenter=frame(gear,"Center",UDim2.fromScale(.5,.5),UDim2.fromOffset(4,4),C.dark,1)
-gearCenter.AnchorPoint=Vector2.new(.5,.5); round(gearCenter,3)
-make("UIStroke",gearCenter,{Color=C.accent,Thickness=1.2,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
-for i=0,7 do
-    local angle=i*math.pi/4
-    local tooth=frame(gear,"Tooth",UDim2.fromOffset(9+math.cos(angle)*7,9+math.sin(angle)*7),UDim2.fromOffset(3,1.5),C.accent,0)
-    tooth.AnchorPoint=Vector2.new(.5,.5); tooth.Rotation=i*45; round(tooth,1)
-end
+lucideIcon(selected,"Settings",UDim2.fromOffset(19,17.5),15,C.accent)
 label(selected,"Settings",UDim2.fromOffset(36,0),UDim2.new(1,-42,1,0),12,C.text,UI_FONTS.Regular)
-local heading=label(header,"Settings",UDim2.fromOffset(207,6),UDim2.new(1,-355,0,48),13,C.text,UI_FONTS.Medium)
+local heading=label(header,"Settings",UDim2.fromOffset(205,0),UDim2.new(1,-353,1,0),13,C.text,UI_FONTS.SemiBold)
 heading.ZIndex=2
 content.ClipsDescendants=true
 local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromScale(1,1),
@@ -325,11 +379,14 @@ local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromS
 local function panel(name,height)
     local p=frame(scroll,name,UDim2.fromOffset(0,0),UDim2.fromOffset(250,height),C.surface,.72)
     round(p,7); stroke(p,.70)
-    label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),12,C.text,UI_FONTS.Medium)
+    make("UIPadding",p,{PaddingTop=UDim.new(0,9),PaddingBottom=UDim.new(0,10),PaddingLeft=UDim.new(0,14),PaddingRight=UDim.new(0,14)})
+    make("UIListLayout",p,{SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,0)})
+    local heading=label(p,name,UDim2.fromOffset(0,0),UDim2.new(1,0,0,27),12,C.text,UI_FONTS.SemiBold)
+    heading.LayoutOrder=0
     return p
 end
-local performance=panel("Performance",201)
-local interface=panel("Interface",148)
+local performance=panel("Performance",204)
+local interface=panel("Interface",156)
 local notice=label(scroll,"",UDim2.fromOffset(4,211),UDim2.new(1,-8,0,32),11,C.muted)
 notice.TextWrapped=true; notice.TextTruncate=Enum.TextTruncate.None
 local function feedback(message)
@@ -340,36 +397,37 @@ local function layoutPanels()
     if width>=420 then
         local half=math.floor((width-6)/2)
         performance.Position=UDim2.fromOffset(0,1)
-        performance.Size=UDim2.fromOffset(half,201)
+        performance.Size=UDim2.fromOffset(half,204)
         interface.Position=UDim2.fromOffset(half+6,1)
-        interface.Size=UDim2.fromOffset(width-half-6,148)
-        notice.Position=UDim2.fromOffset(4,209)
-        scroll.CanvasSize=UDim2.fromOffset(0,244)
+        interface.Size=UDim2.fromOffset(width-half-6,156)
+        notice.Position=UDim2.fromOffset(4,212)
+        scroll.CanvasSize=UDim2.fromOffset(0,248)
     else
         performance.Position=UDim2.fromOffset(0,1)
-        performance.Size=UDim2.fromOffset(width,201)
-        interface.Position=UDim2.fromOffset(0,208)
-        interface.Size=UDim2.fromOffset(width,148)
-        notice.Position=UDim2.fromOffset(4,363)
-        scroll.CanvasSize=UDim2.fromOffset(0,400)
+        performance.Size=UDim2.fromOffset(width,204)
+        interface.Position=UDim2.fromOffset(0,211)
+        interface.Size=UDim2.fromOffset(width,156)
+        notice.Position=UDim2.fromOffset(4,374)
+        scroll.CanvasSize=UDim2.fromOffset(0,412)
     end
 end
 on(scroll:GetPropertyChangedSignal("AbsoluteSize"),layoutPanels)
 on(scale:GetPropertyChangedSignal("Scale"),layoutPanels)
 layoutPanels()
 local function row(p,name,y)
-    local r=frame(p,name,UDim2.fromOffset(10,y),UDim2.new(1,-20,0,35),C.dark,1)
-    local caption=label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),12,C.text,UI_FONTS.Regular)
+    local r=frame(p,name,UDim2.fromOffset(0,0),UDim2.new(1,0,0,38),C.dark,1)
+    r.LayoutOrder=y
+    local caption=label(r,name,UDim2.fromOffset(0,0),UDim2.new(1,-43,1,0),12,C.text,UI_FONTS.Regular)
     caption.Name="Caption"; caption.TextYAlignment=Enum.TextYAlignment.Center
     return r
 end
 local function toggle(p,name,y,callback)
     local r=row(p,name,y)
-    local b=make("TextButton",r,{Name="Toggle",AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
-        Size=UDim2.fromOffset(35,20),BackgroundColor3=C.surface,BackgroundTransparency=.23,Text="",BorderSizePixel=0,AutoButtonColor=false})
+    local b=make("TextButton",r,{Name="Toggle",AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,0,.5,0),
+        Size=UDim2.fromOffset(34,19),BackgroundColor3=C.surface,BackgroundTransparency=.23,Text="",BorderSizePixel=0,AutoButtonColor=false})
     round(b,10); stroke(b,.70)
     local glow=make("UIGradient",b,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(155,100,234)),Rotation=25,Enabled=false})
-    local knob=frame(b,"Knob",UDim2.fromOffset(3,10),UDim2.fromOffset(14,14),C.muted,0)
+    local knob=frame(b,"Knob",UDim2.fromOffset(3,9.5),UDim2.fromOffset(13,13),C.muted,0)
     knob.AnchorPoint=Vector2.new(0,.5); round(knob,7)
     local state=false
     on(b.Activated,function()
@@ -383,7 +441,7 @@ local function toggle(p,name,y,callback)
         feedback("")
         glow.Enabled=state
         tween(b,{BackgroundColor3=state and Color3.fromRGB(184,99,255) or C.surface,BackgroundTransparency=state and 0 or .23},.15)
-        tween(knob,{Position=UDim2.fromOffset(state and 18 or 3,10),BackgroundColor3=state and C.text or C.muted},.15)
+        tween(knob,{Position=UDim2.fromOffset(state and 18 or 3,9.5),BackgroundColor3=state and C.text or C.muted},.15)
     end)
 end
 toggle(performance,"Disable 3D Rendering",35,function(enabled)
@@ -418,10 +476,12 @@ toggle(performance,"FPS Cap",105,function(enabled)
     end
     return true
 end)
-local sliderLabel=label(performance,"FPS Limit",UDim2.fromOffset(13,144),UDim2.new(1,-72,0,21),12,C.text)
-local value=label(performance,"60",UDim2.new(1,-66,0,144),UDim2.fromOffset(53,21),12,C.muted)
+local sliderRow=frame(performance,"FPSLimitRow",UDim2.fromOffset(0,0),UDim2.new(1,0,0,43),C.dark,1)
+sliderRow.LayoutOrder=144
+local sliderLabel=label(sliderRow,"FPS Limit",UDim2.fromOffset(0,0),UDim2.new(1,-52,0,21),12,C.text)
+local value=label(sliderRow,"60",UDim2.new(1,-48,0,0),UDim2.fromOffset(48,21),12,C.muted)
 value.TextXAlignment=Enum.TextXAlignment.Right
-local slider=frame(performance,"Slider",UDim2.fromOffset(13,174),UDim2.new(1,-26,0,6),C.surface,.05)
+local slider=frame(sliderRow,"Slider",UDim2.fromOffset(0,27),UDim2.new(1,0,0,6),C.surface,.05)
 round(slider,4); stroke(slider,.7)
 local fill=frame(slider,"Fill",UDim2.fromOffset(0,0),UDim2.fromScale(30/210,1),C.accent,0); round(fill,4)
 local thumb=frame(slider,"Thumb",UDim2.fromScale(30/210,.5),UDim2.fromOffset(13,13),C.text,0)
@@ -462,25 +522,20 @@ toggle(interface,"Background Blur",35,function(enabled)
     return true
 end)
 local keyRow=row(interface,"Toggle Key",70)
-keyRow.Caption.Size=UDim2.new(1,-83,1,0)
-local keyButton=make("TextButton",keyRow,{AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
-    Size=UDim2.fromOffset(68,24),BackgroundColor3=C.surface,BackgroundTransparency=.18,Text="RShift",
+keyRow.Caption.Size=UDim2.new(1,-60,1,0)
+local keyButton=make("TextButton",keyRow,{AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,0,.5,0),
+    Size=UDim2.fromOffset(52,23),BackgroundColor3=C.surface,BackgroundTransparency=.18,Text="RShift",
     TextColor3=C.muted,FontFace=UI_FONTS.Medium,TextSize=11,BorderSizePixel=0,AutoButtonColor=false})
 round(keyButton,5); stroke(keyButton,.65)
 on(keyButton.Activated,function()
     capturingKey=not capturingKey
     keyButton.Text=capturingKey and "Press key" or (toggleKey==Enum.KeyCode.RightShift and "RShift" or toggleKey.Name)
 end)
-local unload=make("TextButton",interface,{Name="UnloadHub",Position=UDim2.fromOffset(9,109),Size=UDim2.new(1,-18,0,30),
+local unload=make("TextButton",interface,{Name="UnloadHub",Position=UDim2.fromOffset(0,0),Size=UDim2.new(1,0,0,33),LayoutOrder=109,
     Text="",BackgroundColor3=C.surface,BackgroundTransparency=.73,BorderSizePixel=0,AutoButtonColor=false})
 round(unload,5); stroke(unload,.76)
-label(unload,"Unload Hub",UDim2.fromOffset(5,0),UDim2.new(1,-35,1,0),12,C.text)
-local arrow=frame(unload,"Chevron",UDim2.new(1,-15,.5,0),UDim2.fromOffset(8,12),C.dark,1)
-arrow.AnchorPoint=Vector2.new(.5,.5)
-for _,part in ipairs({{3,4,45},{3,8,-45}}) do
-    local line=frame(arrow,"Line",UDim2.fromOffset(part[1],part[2]),UDim2.fromOffset(6,1.2),C.muted,0)
-    line.AnchorPoint=Vector2.new(.5,.5); line.Rotation=part[3]; round(line,1)
-end
+label(unload,"Unload Hub",UDim2.fromOffset(7,0),UDim2.new(1,-35,1,0),12,C.text)
+lucideIcon(unload,"ChevronRight",UDim2.new(1,-12,.5,0),13,C.muted)
 on(unload.MouseEnter,function() tween(unload,{BackgroundTransparency=.48},.12) end)
 on(unload.MouseLeave,function() tween(unload,{BackgroundTransparency=.73},.12) end)
 on(unload.Activated,function() gui:Destroy() end)
