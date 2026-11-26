@@ -1,4 +1,5 @@
--- DULCAN HUB V2.1 | LocalScript | standalone UI
+-- DULCAN HUB V2.2 | LocalScript | standalone UI
+local VERSION = "2.2.0"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,9 +12,9 @@ local old = pg:FindFirstChild("DulcanHub")
 if old then old:Destroy() end
 
 local C = {
-    dark = Color3.fromRGB(9,10,15), purple = Color3.fromRGB(29,25,39),
+    dark = Color3.fromRGB(10,11,16), purple = Color3.fromRGB(30,26,40),
     surface = Color3.fromRGB(44,42,52), border = Color3.fromRGB(100,94,110),
-    accent = Color3.fromRGB(194,128,255), text = Color3.fromRGB(244,241,249),
+    accent = Color3.fromRGB(200,143,255), text = Color3.fromRGB(247,245,250),
     muted = Color3.fromRGB(154,148,169)
 }
 local function make(class, parent, props)
@@ -59,9 +60,14 @@ end)
 -- Original geometric D mark, built entirely from native UI.
 local function logo(p,x,y,s)
     local f=frame(p,"Logo",UDim2.fromOffset(x,y),UDim2.fromOffset(s,s),C.dark,1)
-    local d=label(f,"D",UDim2.fromScale(0,0),UDim2.fromScale(1,1),math.floor(s*.85),C.accent,Enum.Font.GothamBlack)
-    d.TextXAlignment=Enum.TextXAlignment.Center
-    make("UIGradient",d,{Color=ColorSequence.new(Color3.fromRGB(239,218,255),Color3.fromRGB(150,67,238)),Rotation=65})
+    local ring=frame(f,"Monogram",UDim2.fromScale(.20,.18),UDim2.fromScale(.63,.64),C.dark,1)
+    round(ring,math.max(4,math.floor(s*.23)))
+    local outline=make("UIStroke",ring,{Color=Color3.new(1,1,1),Thickness=math.max(1.5,s*.085),ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
+    make("UIGradient",outline,{Color=ColorSequence.new(Color3.fromRGB(239,223,255),Color3.fromRGB(145,73,238)),Rotation=60})
+    local spine=frame(f,"Spine",UDim2.fromScale(.20,.20),UDim2.fromScale(.09,.60),Color3.fromRGB(215,175,255),0)
+    round(spine,1)
+    local slash=frame(f,"Signature",UDim2.fromScale(.07,.53),UDim2.fromScale(.48,.085),C.accent,0)
+    slash.Rotation=-48; round(slash,1)
     return f
 end
 local function button(p,name,txt,pos,size,hover)
@@ -82,22 +88,31 @@ local window=make("CanvasGroup",root,{Name="MainWindow",Size=UDim2.fromOffset(w,
 round(window,10)
 local scale=make("UIScale",window,{Scale=1})
 local bg=frame(window,"Glass",UDim2.fromOffset(0,0),UDim2.fromScale(1,1),Color3.new(1,1,1),.07)
-round(bg,9); stroke(bg,.74)
+round(bg,10); stroke(bg,.68)
 make("UIGradient",bg,{Color=ColorSequence.new({
-    ColorSequenceKeypoint.new(0,C.purple),ColorSequenceKeypoint.new(.5,Color3.fromRGB(20,20,28)),
+    ColorSequenceKeypoint.new(0,C.purple),ColorSequenceKeypoint.new(.45,Color3.fromRGB(23,22,30)),
     ColorSequenceKeypoint.new(1,C.dark)}),Rotation=90})
 local header=frame(window,"Header",UDim2.fromOffset(0,0),UDim2.new(1,0,0,46),C.dark,1)
 local drag=frame(header,"DragArea",UDim2.fromOffset(0,0),UDim2.new(1,-76,1,0),C.dark,1)
 drag.Active=true
 logo(drag,13,8,29)
-local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),14,C.text,Enum.Font.GothamBold)
+local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),15,C.text,Enum.Font.GothamBold)
 title.RichText=true
 local subtitle=label(drag,game.Name,UDim2.fromOffset(51,25),UDim2.fromOffset(200,13),10,C.muted)
-local minimize=button(header,"Minimize","−",UDim2.new(1,-65,0,8),UDim2.fromOffset(28,28))
-local close=button(header,"Close","×",UDim2.new(1,-34,0,8),UDim2.fromOffset(27,28),Color3.fromRGB(134,44,62))
+local version=label(header,"v"..VERSION,UDim2.new(1,-132,0,11),UDim2.fromOffset(59,22),10,C.muted)
+version.TextXAlignment=Enum.TextXAlignment.Center
+local minimize=button(header,"Minimize","",UDim2.new(1,-65,0,8),UDim2.fromOffset(28,28))
+local close=button(header,"Close","",UDim2.new(1,-34,0,8),UDim2.fromOffset(27,28),Color3.fromRGB(134,44,62))
+local function iconLine(parent,rotation,length)
+    local line=frame(parent,"IconLine",UDim2.fromScale(.5,.5),UDim2.fromOffset(length,1.5),C.muted,0)
+    line.AnchorPoint=Vector2.new(.5,.5); line.Rotation=rotation; round(line,1)
+    return line
+end
+iconLine(minimize,0,11)
+iconLine(close,45,12); iconLine(close,-45,12)
 
-local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,47),UDim2.new(0,176,1,-54),C.surface,.68)
-round(sidebar,7); stroke(sidebar,.78)
+local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,47),UDim2.new(0,176,1,-54),C.surface,.77)
+round(sidebar,7); stroke(sidebar,.72)
 local nav=frame(sidebar,"Navigation",UDim2.fromOffset(6,6),UDim2.new(1,-12,1,-59),C.dark,1)
 make("UIListLayout",nav,{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder})
 local content=frame(window,"Content",UDim2.fromOffset(190,47),UDim2.new(1,-197,1,-54),C.dark,1)
@@ -105,11 +120,11 @@ local profile=frame(sidebar,"Profile",UDim2.new(0,6,1,-47),UDim2.new(1,-12,0,41)
 local avatar=make("ImageLabel",profile,{Name="Avatar",Position=UDim2.fromOffset(3,4),Size=UDim2.fromOffset(31,31),
     BackgroundColor3=C.surface,BackgroundTransparency=.35,BorderSizePixel=0,ScaleType=Enum.ScaleType.Crop})
 round(avatar,5); stroke(avatar,.65)
-label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),11,C.text,Enum.Font.GothamMedium)
-label(profile,"@"..player.Name,UDim2.fromOffset(42,21),UDim2.new(1,-44,0,13),9,C.muted)
+label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),12,C.text,Enum.Font.GothamMedium)
+label(profile,"@"..player.Name,UDim2.fromOffset(42,21),UDim2.new(1,-44,0,13),10,C.muted)
 
 -- Compact independent status bar (actual measured values).
-local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,54),UDim2.fromOffset(470,35),C.purple,.10)
+local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,12),UDim2.fromOffset(470,35),C.purple,.10)
 bar.AnchorPoint=Vector2.new(1,0); round(bar,7); stroke(bar,.55)
 local barScale=make("UIScale",bar,{Scale=1})
 make("UIGradient",bar,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(145,135,157)),Rotation=90})
@@ -127,7 +142,7 @@ label(bar,"@"..player.Name,UDim2.fromOffset(195,0),UDim2.fromOffset(82,35),10,C.
 local experience=label(bar,game.Name,UDim2.fromOffset(291,0),UDim2.fromOffset(140,35),10,C.muted)
 local eye=button(bar,"ToggleWindow","",UDim2.fromOffset(437,4),UDim2.fromOffset(27,27))
 local eyeShape=frame(eye,"Eye",UDim2.fromOffset(5,8),UDim2.fromOffset(17,11),C.dark,1)
-round(eyeShape,8); stroke(eyeShape,.05)
+round(eyeShape,8); stroke(eyeShape,.22)
 local pupil=frame(eyeShape,"Pupil",UDim2.fromOffset(6,3),UDim2.fromOffset(5,5),C.muted,0)
 round(pupil,5)
 local slash=frame(eye,"Hidden",UDim2.fromOffset(5,13),UDim2.fromOffset(17,1),C.accent,0)
@@ -223,3 +238,4 @@ on(RunService.RenderStepped,function(dt)
     ping.Text=ok and type(value)=="number" and string.format("%d ms",math.floor(value+.5)) or "— ms"
 end)
 setOpen(true)
+print("[Dulcan Hub] v"..VERSION.." | UI ready")
