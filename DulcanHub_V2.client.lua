@@ -1,4 +1,4 @@
--- DULCAN HUB V2 | LocalScript | standalone UI
+-- DULCAN HUB V2.1 | LocalScript | standalone UI
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ local old = pg:FindFirstChild("DulcanHub")
 if old then old:Destroy() end
 
 local C = {
-    dark = Color3.fromRGB(12,12,17), purple = Color3.fromRGB(35,27,45),
+    dark = Color3.fromRGB(9,10,15), purple = Color3.fromRGB(29,25,39),
     surface = Color3.fromRGB(44,42,52), border = Color3.fromRGB(100,94,110),
     accent = Color3.fromRGB(194,128,255), text = Color3.fromRGB(244,241,249),
     muted = Color3.fromRGB(154,148,169)
@@ -81,10 +81,10 @@ local window=make("CanvasGroup",root,{Name="MainWindow",Size=UDim2.fromOffset(w,
     BackgroundTransparency=1,GroupTransparency=1,BorderSizePixel=0,ClipsDescendants=true})
 round(window,10)
 local scale=make("UIScale",window,{Scale=1})
-local bg=frame(window,"Glass",UDim2.fromOffset(0,0),UDim2.fromScale(1,1),Color3.new(1,1,1),.10)
-round(bg,10); stroke(bg,.65)
+local bg=frame(window,"Glass",UDim2.fromOffset(0,0),UDim2.fromScale(1,1),Color3.new(1,1,1),.07)
+round(bg,9); stroke(bg,.74)
 make("UIGradient",bg,{Color=ColorSequence.new({
-    ColorSequenceKeypoint.new(0,C.purple),ColorSequenceKeypoint.new(.5,Color3.fromRGB(24,22,30)),
+    ColorSequenceKeypoint.new(0,C.purple),ColorSequenceKeypoint.new(.5,Color3.fromRGB(20,20,28)),
     ColorSequenceKeypoint.new(1,C.dark)}),Rotation=90})
 local header=frame(window,"Header",UDim2.fromOffset(0,0),UDim2.new(1,0,0,46),C.dark,1)
 local drag=frame(header,"DragArea",UDim2.fromOffset(0,0),UDim2.new(1,-76,1,0),C.dark,1)
@@ -92,12 +92,12 @@ drag.Active=true
 logo(drag,13,8,29)
 local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),14,C.text,Enum.Font.GothamBold)
 title.RichText=true
-local subtitle=label(drag,"Universal Interface",UDim2.fromOffset(51,25),UDim2.fromOffset(165,13),10,C.muted)
+local subtitle=label(drag,game.Name,UDim2.fromOffset(51,25),UDim2.fromOffset(200,13),10,C.muted)
 local minimize=button(header,"Minimize","−",UDim2.new(1,-65,0,8),UDim2.fromOffset(28,28))
 local close=button(header,"Close","×",UDim2.new(1,-34,0,8),UDim2.fromOffset(27,28),Color3.fromRGB(134,44,62))
 
 local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,47),UDim2.new(0,176,1,-54),C.surface,.68)
-round(sidebar,7); stroke(sidebar,.66)
+round(sidebar,7); stroke(sidebar,.78)
 local nav=frame(sidebar,"Navigation",UDim2.fromOffset(6,6),UDim2.new(1,-12,1,-59),C.dark,1)
 make("UIListLayout",nav,{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder})
 local content=frame(window,"Content",UDim2.fromOffset(190,47),UDim2.new(1,-197,1,-54),C.dark,1)
@@ -109,7 +109,7 @@ label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),11
 label(profile,"@"..player.Name,UDim2.fromOffset(42,21),UDim2.new(1,-44,0,13),9,C.muted)
 
 -- Compact independent status bar (actual measured values).
-local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,12),UDim2.fromOffset(470,35),C.purple,.10)
+local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,54),UDim2.fromOffset(470,35),C.purple,.10)
 bar.AnchorPoint=Vector2.new(1,0); round(bar,7); stroke(bar,.55)
 local barScale=make("UIScale",bar,{Scale=1})
 make("UIGradient",bar,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(145,135,157)),Rotation=90})
@@ -140,7 +140,10 @@ end)
 task.spawn(function()
     if game.PlaceId==0 then return end
     local ok,info=pcall(function() return MarketplaceService:GetProductInfo(game.PlaceId,Enum.InfoType.Asset) end)
-    if alive and ok and info.Name then experience.Text=info.Name end
+    if alive and ok and info and info.Name then
+        experience.Text=info.Name
+        subtitle.Text=info.Name
+    end
 end)
 
 -- Layout, drag, resize and viewport bounds.
