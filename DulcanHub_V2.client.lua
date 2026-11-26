@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8 | LocalScript | standalone UI
-local VERSION = "2.8.0"
+-- DULCAN HUB V2.8.1 | LocalScript | standalone UI
+local VERSION = "2.8.1"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -20,6 +20,7 @@ local C = {
 local function make(class, parent, props)
     local o = Instance.new(class)
     for k,v in pairs(props or {}) do o[k] = v end
+    if o:IsA("GuiBase2d") then o.AutoLocalize = false end
     o.Parent = parent
     return o
 end
@@ -37,7 +38,7 @@ local function stroke(p,t)
 end
 local function label(p,txt,pos,size,px,color,font)
     return make("TextLabel",p,{BackgroundTransparency=1,Position=pos,Size=size,
-        Text=txt,TextSize=px,TextColor3=color or C.text,Font=font or Enum.Font.GothamMedium,
+        Text=txt,TextSize=px,TextColor3=color or C.text,Font=font or Enum.Font.BuilderSans,
         TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd})
 end
 local function tween(o,props,time)
@@ -209,7 +210,7 @@ local function logo(p,x,y,s)
 end
 local function button(p,name,txt,pos,size,hover)
     local b=make("TextButton",p,{Name=name,Position=pos,Size=size,Text=txt,
-        Font=Enum.Font.GothamMedium,TextSize=18,TextColor3=C.muted,
+        Font=Enum.Font.BuilderSansMedium,TextSize=18,TextColor3=C.muted,
         BackgroundColor3=hover or C.surface,BackgroundTransparency=1,
         AutoButtonColor=false,BorderSizePixel=0})
     round(b,5)
@@ -234,10 +235,10 @@ local drag=frame(header,"DragArea",UDim2.fromOffset(0,0),UDim2.new(1,-76,1,0),C.
 drag.Active=true
 local fallbackLogo=logo(drag,13,8,29)
 local brandOK,brandImage=pcall(rasterLogo,drag,"OfficialBrand",UDim2.fromOffset(7,1),UDim2.fromOffset(192,64),false)
-local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),15,C.text,Enum.Font.GothamBold)
+local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),15,C.text,Enum.Font.BuilderSansBold)
 title.RichText=true
-local subtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(51,25),UDim2.fromOffset(200,14),11,C.text,Enum.Font.GothamMedium)
-local brandSubtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(83,44),UDim2.fromOffset(143,15),11,Color3.fromRGB(232,224,243),Enum.Font.GothamMedium)
+local subtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(51,25),UDim2.fromOffset(200,14),11,C.text,Enum.Font.BuilderSansMedium)
+local brandSubtitle=label(drag,"UNIVERSAL INTERFACE",UDim2.fromOffset(83,44),UDim2.fromOffset(143,15),11,Color3.fromRGB(232,224,243),Enum.Font.BuilderSansMedium)
 brandSubtitle.Name="OfficialBrandSubtitle"
 brandSubtitle.TextTruncate=Enum.TextTruncate.None
 brandSubtitle.ZIndex=3
@@ -267,7 +268,7 @@ local profile=frame(sidebar,"Profile",UDim2.new(0,6,1,-47),UDim2.new(1,-12,0,41)
 local avatar=make("ImageLabel",profile,{Name="Avatar",Position=UDim2.fromOffset(3,4),Size=UDim2.fromOffset(31,31),
     BackgroundColor3=C.surface,BackgroundTransparency=.35,BorderSizePixel=0,ScaleType=Enum.ScaleType.Crop})
 round(avatar,5); stroke(avatar,.65)
-label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),12,C.text,Enum.Font.GothamMedium)
+label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),12,C.text,Enum.Font.BuilderSansMedium)
 label(profile,"@"..player.Name,UDim2.fromOffset(42,21),UDim2.new(1,-44,0,13),10,C.muted)
 
 -- Settings only: two compact panels, no game-specific functions.
@@ -292,9 +293,9 @@ local selected=make("TextButton",nav,{Name="Settings",Size=UDim2.new(1,-2,0,35),
     BackgroundColor3=C.surface,BackgroundTransparency=.38,Text="",AutoButtonColor=false,BorderSizePixel=0})
 round(selected,6); stroke(selected,.72)
 local gear=label(selected,"⚙",UDim2.fromOffset(11,0),UDim2.fromOffset(24,35),19,C.accent)
-gear.Font=Enum.Font.Gotham
-label(selected,"Settings",UDim2.fromOffset(40,0),UDim2.new(1,-45,1,0),13,C.text)
-local heading=label(header,"Settings",UDim2.fromOffset(242,6),UDim2.new(1,-390,0,48),14,C.text,Enum.Font.GothamMedium)
+gear.Font=Enum.Font.BuilderSans
+label(selected,"Settings",UDim2.fromOffset(40,0),UDim2.new(1,-45,1,0),14,C.text,Enum.Font.BuilderSansMedium)
+local heading=label(header,"Settings",UDim2.fromOffset(242,6),UDim2.new(1,-390,0,48),15,C.text,Enum.Font.BuilderSansMedium)
 heading.ZIndex=2
 content.ClipsDescendants=true
 local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromScale(1,1),
@@ -303,7 +304,7 @@ local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromS
 local function panel(name,height)
     local p=frame(scroll,name,UDim2.fromOffset(0,0),UDim2.fromOffset(250,height),C.surface,.72)
     round(p,7); stroke(p,.65)
-    label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),13,C.text,Enum.Font.GothamBold)
+    label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),13,C.text,Enum.Font.BuilderSansBold)
     return p
 end
 local performance=panel("Performance",201)
@@ -336,7 +337,7 @@ on(scroll:GetPropertyChangedSignal("AbsoluteSize"),layoutPanels)
 layoutPanels()
 local function row(p,name,y)
     local r=frame(p,name,UDim2.fromOffset(10,y),UDim2.new(1,-20,0,35),C.dark,1)
-    label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),12,C.text)
+    label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),13,C.text)
     return r
 end
 local function toggle(p,name,y,callback)
@@ -438,7 +439,7 @@ end)
 local keyRow=row(interface,"Toggle Key",70)
 local keyButton=make("TextButton",keyRow,{AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
     Size=UDim2.fromOffset(68,24),BackgroundColor3=C.surface,BackgroundTransparency=.18,Text="RShift",
-    TextColor3=C.muted,Font=Enum.Font.GothamMedium,TextSize=11,BorderSizePixel=0,AutoButtonColor=false})
+    TextColor3=C.muted,Font=Enum.Font.BuilderSansMedium,TextSize=11,BorderSizePixel=0,AutoButtonColor=false})
 round(keyButton,5); stroke(keyButton,.65)
 on(keyButton.Activated,function()
     capturingKey=not capturingKey
