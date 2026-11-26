@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8.3 | LocalScript | standalone UI
-local VERSION = "2.8.3"
+-- DULCAN HUB V2.8.4 | LocalScript | standalone UI
+local VERSION = "2.8.4"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -20,9 +20,9 @@ local C = {
 -- Typography follows the public Fluent reference (not a verified Axon font).
 local UI_FONT_FAMILY = "rbxasset://fonts/families/GothamSSm.json"
 local UI_FONTS = {
-    Regular = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Regular, Enum.FontStyle.Normal),
-    Medium = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-    SemiBold = Font.new(UI_FONT_FAMILY, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
+    Regular = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Medium, Enum.FontStyle.Normal),
+    Medium = Font.new(UI_FONT_FAMILY, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+    SemiBold = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 }
 local function make(class, parent, props)
     local o = Instance.new(class)
