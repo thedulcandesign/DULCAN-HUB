@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8.7 | LocalScript | standalone UI
-local VERSION = "2.8.7"
+-- DULCAN HUB V2.8.8 | LocalScript | standalone UI
+local VERSION = "2.8.8"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -302,10 +302,21 @@ on(gui.Destroying,restoreSettings)
 local selected=make("TextButton",nav,{Name="Settings",Size=UDim2.new(1,-2,0,35),
     BackgroundColor3=C.surface,BackgroundTransparency=.38,Text="",AutoButtonColor=false,BorderSizePixel=0})
 round(selected,6); stroke(selected,.72)
-local gear=label(selected,"⚙",UDim2.fromOffset(11,0),UDim2.fromOffset(24,35),19,C.accent)
-gear.Font=Enum.Font.BuilderSans
-label(selected,"Settings",UDim2.fromOffset(40,0),UDim2.new(1,-45,1,0),12,C.text,UI_FONTS.Regular)
-local heading=label(header,"Settings",UDim2.fromOffset(242,6),UDim2.new(1,-390,0,48),13,C.text,UI_FONTS.Medium)
+local gear=frame(selected,"SettingsIcon",UDim2.fromOffset(13,17.5),UDim2.fromOffset(18,18),C.dark,1)
+gear.AnchorPoint=Vector2.new(0,.5)
+local gearRing=frame(gear,"Ring",UDim2.fromScale(.5,.5),UDim2.fromOffset(11,11),C.dark,1)
+gearRing.AnchorPoint=Vector2.new(.5,.5); round(gearRing,6)
+make("UIStroke",gearRing,{Color=C.accent,Thickness=1.3,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
+local gearCenter=frame(gear,"Center",UDim2.fromScale(.5,.5),UDim2.fromOffset(4,4),C.dark,1)
+gearCenter.AnchorPoint=Vector2.new(.5,.5); round(gearCenter,3)
+make("UIStroke",gearCenter,{Color=C.accent,Thickness=1.2,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
+for i=0,7 do
+    local angle=i*math.pi/4
+    local tooth=frame(gear,"Tooth",UDim2.fromOffset(9+math.cos(angle)*7,9+math.sin(angle)*7),UDim2.fromOffset(3,1.5),C.accent,0)
+    tooth.AnchorPoint=Vector2.new(.5,.5); tooth.Rotation=i*45; round(tooth,1)
+end
+label(selected,"Settings",UDim2.fromOffset(36,0),UDim2.new(1,-42,1,0),12,C.text,UI_FONTS.Regular)
+local heading=label(header,"Settings",UDim2.fromOffset(207,6),UDim2.new(1,-355,0,48),13,C.text,UI_FONTS.Medium)
 heading.ZIndex=2
 content.ClipsDescendants=true
 local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromScale(1,1),
@@ -313,7 +324,7 @@ local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromS
     ScrollBarThickness=3,ScrollBarImageColor3=C.muted,ScrollingDirection=Enum.ScrollingDirection.Y})
 local function panel(name,height)
     local p=frame(scroll,name,UDim2.fromOffset(0,0),UDim2.fromOffset(250,height),C.surface,.72)
-    round(p,7); stroke(p,.65)
+    round(p,7); stroke(p,.70)
     label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),12,C.text,UI_FONTS.Medium)
     return p
 end
@@ -348,16 +359,18 @@ on(scale:GetPropertyChangedSignal("Scale"),layoutPanels)
 layoutPanels()
 local function row(p,name,y)
     local r=frame(p,name,UDim2.fromOffset(10,y),UDim2.new(1,-20,0,35),C.dark,1)
-    label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),12,C.text,UI_FONTS.Regular)
+    local caption=label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),12,C.text,UI_FONTS.Regular)
+    caption.Name="Caption"; caption.TextYAlignment=Enum.TextYAlignment.Center
     return r
 end
 local function toggle(p,name,y,callback)
     local r=row(p,name,y)
     local b=make("TextButton",r,{Name="Toggle",AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
-        Size=UDim2.fromOffset(35,21),BackgroundColor3=C.surface,BackgroundTransparency=.15,Text="",BorderSizePixel=0,AutoButtonColor=false})
-    round(b,11); stroke(b,.60)
-    local knob=frame(b,"Knob",UDim2.fromOffset(3,3),UDim2.fromOffset(15,15),C.muted,0)
-    round(knob,8)
+        Size=UDim2.fromOffset(35,20),BackgroundColor3=C.surface,BackgroundTransparency=.23,Text="",BorderSizePixel=0,AutoButtonColor=false})
+    round(b,10); stroke(b,.70)
+    local glow=make("UIGradient",b,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(155,100,234)),Rotation=25,Enabled=false})
+    local knob=frame(b,"Knob",UDim2.fromOffset(3,10),UDim2.fromOffset(14,14),C.muted,0)
+    knob.AnchorPoint=Vector2.new(0,.5); round(knob,7)
     local state=false
     on(b.Activated,function()
         local nextState=not state
@@ -368,8 +381,9 @@ local function toggle(p,name,y,callback)
         end
         state=nextState
         feedback("")
-        tween(b,{BackgroundColor3=state and C.accent or C.surface},.15)
-        tween(knob,{Position=UDim2.fromOffset(state and 17 or 3,3),BackgroundColor3=state and C.text or C.muted},.15)
+        glow.Enabled=state
+        tween(b,{BackgroundColor3=state and Color3.fromRGB(184,99,255) or C.surface,BackgroundTransparency=state and 0 or .23},.15)
+        tween(knob,{Position=UDim2.fromOffset(state and 18 or 3,10),BackgroundColor3=state and C.text or C.muted},.15)
     end)
 end
 toggle(performance,"Disable 3D Rendering",35,function(enabled)
@@ -448,6 +462,7 @@ toggle(interface,"Background Blur",35,function(enabled)
     return true
 end)
 local keyRow=row(interface,"Toggle Key",70)
+keyRow.Caption.Size=UDim2.new(1,-83,1,0)
 local keyButton=make("TextButton",keyRow,{AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-3,.5,0),
     Size=UDim2.fromOffset(68,24),BackgroundColor3=C.surface,BackgroundTransparency=.18,Text="RShift",
     TextColor3=C.muted,FontFace=UI_FONTS.Medium,TextSize=11,BorderSizePixel=0,AutoButtonColor=false})
@@ -460,7 +475,14 @@ local unload=make("TextButton",interface,{Name="UnloadHub",Position=UDim2.fromOf
     Text="",BackgroundColor3=C.surface,BackgroundTransparency=.73,BorderSizePixel=0,AutoButtonColor=false})
 round(unload,5); stroke(unload,.76)
 label(unload,"Unload Hub",UDim2.fromOffset(5,0),UDim2.new(1,-35,1,0),12,C.text)
-local arrow=label(unload,"›",UDim2.new(1,-22,0,0),UDim2.fromOffset(16,30),18,C.muted)
+local arrow=frame(unload,"Chevron",UDim2.new(1,-15,.5,0),UDim2.fromOffset(8,12),C.dark,1)
+arrow.AnchorPoint=Vector2.new(.5,.5)
+for _,part in ipairs({{3,4,45},{3,8,-45}}) do
+    local line=frame(arrow,"Line",UDim2.fromOffset(part[1],part[2]),UDim2.fromOffset(6,1.2),C.muted,0)
+    line.AnchorPoint=Vector2.new(.5,.5); line.Rotation=part[3]; round(line,1)
+end
+on(unload.MouseEnter,function() tween(unload,{BackgroundTransparency=.48},.12) end)
+on(unload.MouseLeave,function() tween(unload,{BackgroundTransparency=.73},.12) end)
 on(unload.Activated,function() gui:Destroy() end)
 
 -- Compact status bar inspired by the visual reference.
