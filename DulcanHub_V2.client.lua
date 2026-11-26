@@ -1,5 +1,5 @@
--- DULCAN HUB V2.3 | LocalScript | standalone UI
-local VERSION = "2.3.0"
+-- DULCAN HUB V2.4 | LocalScript | standalone UI
+local VERSION = "2.4.0"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -57,50 +57,121 @@ on(gui.Destroying,function()
     for _,c in ipairs(connections) do c:Disconnect() end
 end)
 
--- Official transparent logo, embedded at UI resolution (240 x 80 PNG).
--- Only this static image is written, when a local image API is available.
-local LOGO_PNG = "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"
-local ROBLOX_LOGO_ASSET = "" -- Optional approved Roblox image asset ID for Studio.
-local function decodeBase64(data)
-    local alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-    local lookup = {}
-    for i = 1, #alphabet do lookup[alphabet:sub(i,i)] = i-1 end
-    local out, value, bits = {}, 0, 0
-    for i = 1, #data do
-        local n = lookup[data:sub(i,i)]
-        if n then
-            value = value * 64 + n
-            bits = bits + 6
-            if bits >= 8 then
-                bits = bits - 8
-                out[#out+1] = string.char(math.floor(value / 2^bits))
-                value = value % 2^bits
+-- Transparent raster derived from the approved cinematic artwork.
+-- Native UI strips: no remote image, file API, or asset permissions required.
+local LOGO_ROWS = {
+    "0",
+    "0000000000000000000000G",
+    "000000000000000000000N5JM",
+    "00000000000000000000N9GJ5",
+    "0000000000000000000065EJ4K",
+    "0000000000MO00000005654454G00000000VO",
+    "00000000000467CC000C115091C0000P79G4M",
+    "0000000000005911000C1164917000719655",
+    "00000000000055617CO9115F1119P711519M",
+    "000000000000S449FJ5119559911966J59O",
+    "00000000000004E0JJ454EDDJ459194E5500NM56O",
+    "00000000000004J4J2D45GFF5556694E0S0M5GG566O",
+    "0000000000000045559111111111119E47754696600M",
+    "00000000M000006119966666IIFFF516516461",
+    "000000006II322BBD2222222222222D619559N",
+    "0000000006596322BBBBBBB222222222K99617",
+    "000000000054916322222222222222222K6666P",
+    "0000000000C6459111111119966F2222B2B91544SNF000022222220020000220200000022223000220000200022000EE000EES4EV00EES44444E",
+    "0000000000015491188888111196632BBBDF115EJ6GFN08222222283230002382200002222230032230022BC02200GE4000E46E4M0VE46EEEEEEEM",
+    "000000000M71641112222291111166FDBBBB91KD25GGPC32B888228228003233230002238880002223002228822O044500045645000456EG995E4N",
+    "000000VV0691G511322223111111156FBBBD65D2D5KF9132811122822107228328000221117C7B2323732223823CM44G0044654600545GE4G54E5",
+    "000000000S915119222225111111166IDBDD4JDJ46JK6922811823823171228BB1C082B117C73281231323BB3B80O44444446046CP446444E4447",
+    "000000000619119F2222D5111111165K22D4KK5456DJ662B111823I28118B38B317782I1111822332B13B1333380544665446441164464499644V",
+    "0000000G5195196D22D2J6111111944D2DFI616596JJ68B3F3F3B833388338833I38I3388813BB22B383318333PC545116456445554G64566544M",
+    "00000455954516F2BB3D411111995EJ2K566116CN6KK93BB22BB31333333313BD2B88333338B31113B83311333CM4E611GE56E4444E6G44EEEEG",
+    "0000455444J495D3333J61611990JDDKFIFF11C00PFF98333II81193333I11333II818I8I98317C783888118380MG46554G61GGGGG61GGGGGG6C",
+    "00045544G99554D333BG1199544K44DDBFBF170000F5CC777777CC7111111111111111111117C00C1111177117CC11111177C77777CCC7777C",
+    "00S5561191165K3FF3B9195556995DD333D61000000S000MMMOO7C711111111111181111811C0071811818181181811118CCCMMMVVV",
+    "00656C0191164DFI33911191119IDB3332I1P000000S00665FG56118118111818118188181810C818811181881618181187765GKK4G5",
+    "00N660001115J3I381I3B2222DBD333D2I19N0000000000CCCCCC0C77777777777777777777C00CC77777777777777777700CCNNNNN",
+    "000OO0001114DFF88333B2223333BB2D595O",
+    "0000O0000C6JDF88III3333333D222D9944",
+    "00000000004DDB33333333BD22222K9165",
+    "0000000000J2DDKFFIIIFFFFKKDD4999O",
+    "00000000002D459111111111990E599N",
+    "000000000JK59P77777777PPPPSSPC",
+    "000000000K97",
+    "0000000057",
+    "0",
+    "0"
+}
+local LOGO_PALETTE = {
+    {0,0,0,0},
+    {24,16,33,245},
+    {226,222,236,249},
+    {153,149,166,250},
+    {160,24,223,249},
+    {106,25,152,249},
+    {78,24,107,247},
+    {20,16,25,154},
+    {93,92,97,247},
+    {48,13,81,249},
+    {99,10,105,10},
+    {181,173,203,252},
+    {25,17,32,95},
+    {216,164,233,252},
+    {205,25,249,244},
+    {138,97,161,249},
+    {141,39,171,248},
+    {32,7,89,17},
+    {119,103,136,252},
+    {220,94,245,252},
+    {173,89,212,251},
+    {255,255,255,1},
+    {79,29,101,97},
+    {51,17,76,96},
+    {76,28,105,150},
+    {51,17,78,158},
+    {98,19,166,11},
+    {156,35,167,17},
+    {109,35,145,158},
+    {103,99,105,15},
+    {255,0,255,1},
+    {113,35,140,100}
+}
+local function rasterLogo(parent,name,pos,size,crop)
+    local width = crop and 42 or 120
+    local layer = frame(parent,name,pos,size,C.dark,1)
+    layer.Visible=false
+    layer.ClipsDescendants=true
+    local colors,alphas={},{}
+    for i,p in ipairs(LOGO_PALETTE) do
+        colors[i]=Color3.fromRGB(p[1],p[2],p[3])
+        alphas[i]=1-p[4]/255
+    end
+    for y,row in ipairs(LOGO_ROWS) do
+        for x=1,width,12 do
+            local n=math.min(12,width-x+1)
+            local indices={}
+            local visible=false
+            for k=1,n do
+                local index=(tonumber(row:sub(x+k-1,x+k-1),32) or 0)+1
+                indices[k]=index
+                if alphas[index]<.92 then visible=true end
+            end
+            if visible then
+                local strip=frame(layer,"Strip",UDim2.fromScale((x-1)/width,(y-1)/40),
+                    UDim2.fromScale(n/width,1/40),Color3.new(1,1,1),0)
+                local ck,ak={},{}
+                local function point(t,i)
+                    ck[#ck+1]=ColorSequenceKeypoint.new(t,colors[i])
+                    ak[#ak+1]=NumberSequenceKeypoint.new(t,alphas[i])
+                end
+                point(0,indices[1])
+                for k=1,n do point((k-.5)/n,indices[k]) end
+                point(1,indices[n])
+                make("UIGradient",strip,{Color=ColorSequence.new(ck),
+                    Transparency=NumberSequence.new(ak),Rotation=0})
             end
         end
     end
-    return table.concat(out)
-end
-local function resolveLogo()
-    if ROBLOX_LOGO_ASSET ~= "" then return "rbxassetid://" .. ROBLOX_LOGO_ASSET end
-    if type(writefile) ~= "function" or type(getcustomasset) ~= "function" then return nil end
-    local ok, result = pcall(function()
-        local file = "DulcanHub_logo_v230.png"
-        writefile(file, decodeBase64(LOGO_PNG))
-        return getcustomasset(file)
-    end)
-    if ok and type(result) == "string" and result ~= "" then return result end
-    return nil
-end
-local logoAsset = resolveLogo()
-local function officialImage(parent, name, pos, size, crop)
-    local img = make("ImageLabel", parent, {Name=name, Position=pos, Size=size,
-        BackgroundTransparency=1, BorderSizePixel=0, Image=logoAsset or "",
-        ScaleType=Enum.ScaleType.Fit, Visible=false})
-    if crop then
-        img.ImageRectOffset=Vector2.new(0,0)
-        img.ImageRectSize=Vector2.new(83,80)
-    end
-    return img
+    return layer
 end
 -- Native geometric fallback, for clients without local image support.
 local function logo(p,x,y,s)
@@ -137,11 +208,11 @@ round(bg,10); stroke(bg,.68)
 make("UIGradient",bg,{Color=ColorSequence.new({
     ColorSequenceKeypoint.new(0,C.purple),ColorSequenceKeypoint.new(.45,Color3.fromRGB(23,22,30)),
     ColorSequenceKeypoint.new(1,C.dark)}),Rotation=90})
-local header=frame(window,"Header",UDim2.fromOffset(0,0),UDim2.new(1,0,0,46),C.dark,1)
+local header=frame(window,"Header",UDim2.fromOffset(0,0),UDim2.new(1,0,0,60),C.dark,1)
 local drag=frame(header,"DragArea",UDim2.fromOffset(0,0),UDim2.new(1,-76,1,0),C.dark,1)
 drag.Active=true
 local fallbackLogo=logo(drag,13,8,29)
-local brandImage=officialImage(drag,"OfficialBrand",UDim2.fromOffset(9,3),UDim2.fromOffset(144,40),false)
+local brandOK,brandImage=pcall(rasterLogo,drag,"OfficialBrand",UDim2.fromOffset(7,2),UDim2.fromOffset(168,56),false)
 local title=label(drag,'Dulcan <font color="#C280FF">Hub</font>',UDim2.fromOffset(51,6),UDim2.fromOffset(165,19),15,C.text,Enum.Font.GothamBold)
 title.RichText=true
 local subtitle=label(drag,game.Name,UDim2.fromOffset(51,25),UDim2.fromOffset(200,13),10,C.muted)
@@ -157,11 +228,11 @@ end
 iconLine(minimize,0,11)
 iconLine(close,45,12); iconLine(close,-45,12)
 
-local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,47),UDim2.new(0,176,1,-54),C.surface,.77)
+local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,60),UDim2.new(0,176,1,-67),C.surface,.77)
 round(sidebar,7); stroke(sidebar,.72)
 local nav=frame(sidebar,"Navigation",UDim2.fromOffset(6,6),UDim2.new(1,-12,1,-59),C.dark,1)
 make("UIListLayout",nav,{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder})
-local content=frame(window,"Content",UDim2.fromOffset(190,47),UDim2.new(1,-197,1,-54),C.dark,1)
+local content=frame(window,"Content",UDim2.fromOffset(190,60),UDim2.new(1,-197,1,-67),C.dark,1)
 local profile=frame(sidebar,"Profile",UDim2.new(0,6,1,-47),UDim2.new(1,-12,0,41),C.dark,1)
 local avatar=make("ImageLabel",profile,{Name="Avatar",Position=UDim2.fromOffset(3,4),Size=UDim2.fromOffset(31,31),
     BackgroundColor3=C.surface,BackgroundTransparency=.35,BorderSizePixel=0,ScaleType=Enum.ScaleType.Crop})
@@ -175,7 +246,7 @@ bar.AnchorPoint=Vector2.new(1,0); round(bar,7); stroke(bar,.55)
 local barScale=make("UIScale",bar,{Scale=1})
 make("UIGradient",bar,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(145,135,157)),Rotation=90})
 local fallbackBarLogo=logo(bar,8,5,23)
-local barLogo=officialImage(bar,"OfficialEmblem",UDim2.fromOffset(7,4),UDim2.fromOffset(25,27),true)
+local barOK,barLogo=pcall(rasterLogo,bar,"OfficialEmblem",UDim2.fromOffset(6,3),UDim2.fromOffset(28,28),true)
 local fps=label(bar,"— FPS",UDim2.fromOffset(36,0),UDim2.fromOffset(59,35),11,C.text)
 local ping=label(bar,"— ms",UDim2.fromOffset(102,0),UDim2.fromOffset(59,35),11,C.muted)
 local function separator(x)
@@ -195,23 +266,20 @@ round(pupil,5)
 local slash=frame(eye,"Hidden",UDim2.fromOffset(5,13),UDim2.fromOffset(17,1),C.accent,0)
 slash.Rotation=-40; slash.Visible=false
 
--- Keep the native fallback until the actual image is loaded.
-if logoAsset then
-    task.spawn(function()
-        local contentProvider=game:GetService("ContentProvider")
-        pcall(function() contentProvider:PreloadAsync({brandImage,barLogo}) end)
-        if not alive then return end
-        if brandImage.IsLoaded then
-            brandImage.Visible=true
-            fallbackLogo.Visible=false
-            title.Visible=false
-            subtitle.Visible=false
-        end
-        if barLogo.IsLoaded then
-            barLogo.Visible=true
-            fallbackBarLogo.Visible=false
-        end
-    end)
+-- The native raster is synchronous; retain the geometric fallback only on error.
+if brandOK then
+    brandImage.Visible=true
+    fallbackLogo.Visible=false
+    title.Visible=false
+    subtitle.Visible=false
+else
+    warn("[Dulcan Hub] Header artwork: "..tostring(brandImage))
+end
+if barOK then
+    barLogo.Visible=true
+    fallbackBarLogo.Visible=false
+else
+    warn("[Dulcan Hub] Status artwork: "..tostring(barLogo))
 end
 
 task.spawn(function()
