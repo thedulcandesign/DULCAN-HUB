@@ -1,5 +1,5 @@
--- DULCAN HUB V2.6 | LocalScript | standalone UI
-local VERSION = "2.6.0"
+-- DULCAN HUB V2.7 | LocalScript | standalone UI
+local VERSION = "2.7.0"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -256,7 +256,11 @@ iconLine(close,45,12); iconLine(close,-45,12)
 
 local sidebar=frame(window,"Sidebar",UDim2.fromOffset(7,66),UDim2.new(0,176,1,-73),C.surface,.77)
 round(sidebar,7); stroke(sidebar,.72)
-local nav=frame(sidebar,"Navigation",UDim2.fromOffset(6,6),UDim2.new(1,-12,1,-59),C.dark,1)
+local nav=make("ScrollingFrame",sidebar,{Name="Navigation",Position=UDim2.fromOffset(6,6),
+    Size=UDim2.new(1,-12,1,-59),BackgroundTransparency=1,BorderSizePixel=0,
+    CanvasSize=UDim2.fromOffset(0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,
+    ScrollingDirection=Enum.ScrollingDirection.Y,ScrollBarThickness=2,
+    ScrollBarImageColor3=C.muted,ClipsDescendants=true})
 make("UIListLayout",nav,{Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder})
 local content=frame(window,"Content",UDim2.fromOffset(190,66),UDim2.new(1,-197,1,-73),C.dark,1)
 local profile=frame(sidebar,"Profile",UDim2.new(0,6,1,-47),UDim2.new(1,-12,0,41),C.dark,1)
@@ -265,6 +269,123 @@ local avatar=make("ImageLabel",profile,{Name="Avatar",Position=UDim2.fromOffset(
 round(avatar,5); stroke(avatar,.65)
 label(profile,player.DisplayName,UDim2.fromOffset(42,5),UDim2.new(1,-44,0,16),12,C.text,Enum.Font.GothamMedium)
 label(profile,"@"..player.Name,UDim2.fromOffset(42,21),UDim2.new(1,-44,0,13),10,C.muted)
+
+-- Native navigation framework. No game-specific functionality.
+content.ClipsDescendants=true
+local tabs,activeTab={},nil
+local function navIcon(parent,kind)
+    local holder=frame(parent,"Icon",UDim2.fromOffset(12,8),UDim2.fromOffset(18,18),C.dark,1)
+    local parts={}
+    local function mark(x,y,w,h,rotation,radius)
+        local p=frame(holder,"Mark",UDim2.fromOffset(x,y),UDim2.fromOffset(w,h),C.muted,0)
+        p.Rotation=rotation or 0
+        if radius then round(p,radius) end
+        parts[#parts+1]={object=p,property="BackgroundColor3"}
+        return p
+    end
+    local function outline(x,y,w,h,radius)
+        local p=frame(holder,"Outline",UDim2.fromOffset(x,y),UDim2.fromOffset(w,h),C.dark,1)
+        round(p,radius)
+        local edge=make("UIStroke",p,{Color=C.muted,Thickness=1.25,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
+        parts[#parts+1]={object=edge,property="Color"}
+        return p
+    end
+    if kind=="Home" then
+        mark(1,5,10,1.5,-45,1); mark(8,5,10,1.5,45,1)
+        outline(4,8,10,9,2)
+    elseif kind=="Components" then
+        for y=0,1 do for x=0,1 do outline(2+x*8,2+y*8,5,5,1) end end
+    elseif kind=="Settings" then
+        outline(4,4,10,10,5)
+        outline(7,7,4,4,2)
+        for _,p in ipairs({{8,1,2,3},{8,14,2,3},{1,8,3,2},{14,8,3,2}}) do
+            mark(p[1],p[2],p[3],p[4],0,1)
+        end
+    else
+        outline(2,2,14,14,7)
+        mark(8,5,2,2,0,1); mark(8,9,2,5,0,1)
+    end
+    return parts
+end
+local function section(parent,caption,order)
+    local l=label(parent,caption,UDim2.fromOffset(0,0),UDim2.new(1,0,0,24),10,C.muted,Enum.Font.GothamMedium)
+    l.LayoutOrder=order
+    make("UIPadding",l,{PaddingLeft=UDim.new(0,10)})
+end
+local function selectTab(tab)
+    if activeTab==tab then return end
+    activeTab=tab
+    for _,entry in ipairs(tabs) do
+        local selected=entry==tab
+        entry.page.Visible=selected
+        entry.indicator.Visible=selected
+        tween(entry.button,{BackgroundTransparency=selected and .74 or 1},.16)
+        tween(entry.caption,{TextColor3=selected and C.text or C.muted},.16)
+        for _,part in ipairs(entry.icon) do
+            tween(part.object,{[part.property]=selected and C.accent or C.muted},.16)
+        end
+    end
+    if tab.transition then tab.transition:Cancel() end
+    tab.inner.Position=UDim2.fromOffset(0,5)
+    tab.transition=tween(tab.inner,{Position=UDim2.fromOffset(0,0)},.20)
+end
+local function addTab(name,description,order)
+    local b=make("TextButton",nav,{Name=name,Size=UDim2.new(1,-2,0,34),
+        BackgroundColor3=C.accent,BackgroundTransparency=1,BorderSizePixel=0,
+        Text="",AutoButtonColor=false,LayoutOrder=order})
+    round(b,6)
+    local indicator=frame(b,"Selected",UDim2.fromOffset(0,7),UDim2.fromOffset(3,20),C.accent,0)
+    round(indicator,2); indicator.Visible=false
+    local caption=label(b,name,UDim2.fromOffset(40,0),UDim2.new(1,-46,1,0),13,C.muted)
+    local icon=navIcon(b,name)
+    local page=make("ScrollingFrame",content,{Name=name.."Page",Size=UDim2.fromScale(1,1),
+        BackgroundTransparency=1,BorderSizePixel=0,Visible=false,
+        CanvasSize=UDim2.fromOffset(0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,
+        ScrollBarThickness=3,ScrollBarImageColor3=C.muted,ScrollingDirection=Enum.ScrollingDirection.Y})
+    local inner=frame(page,"PageContent",UDim2.fromOffset(0,0),UDim2.new(1,-8,0,0),C.dark,1)
+    inner.AutomaticSize=Enum.AutomaticSize.Y
+    make("UIListLayout",inner,{Padding=UDim.new(0,8),SortOrder=Enum.SortOrder.LayoutOrder})
+    make("UIPadding",inner,{PaddingLeft=UDim.new(0,8),PaddingRight=UDim.new(0,8),PaddingTop=UDim.new(0,5),PaddingBottom=UDim.new(0,10)})
+    local heading=frame(inner,"Heading",UDim2.fromOffset(0,0),UDim2.new(1,0,0,48),C.dark,1)
+    heading.LayoutOrder=1
+    label(heading,name,UDim2.fromOffset(0,0),UDim2.new(1,0,0,27),21,C.text,Enum.Font.GothamBold)
+    label(heading,description,UDim2.fromOffset(0,28),UDim2.new(1,0,0,17),11,C.muted)
+    local entry={button=b,caption=caption,indicator=indicator,icon=icon,page=page,inner=inner}
+    tabs[#tabs+1]=entry
+    on(b.Activated,function() selectTab(entry) end)
+    on(b.MouseEnter,function()
+        if activeTab~=entry then tween(b,{BackgroundTransparency=.90},.12) end
+    end)
+    on(b.MouseLeave,function()
+        if activeTab~=entry then tween(b,{BackgroundTransparency=1},.12) end
+    end)
+    return inner,entry
+end
+local function infoCard(parent,name,body,order)
+    local card=frame(parent,"InfoCard",UDim2.fromOffset(0,0),UDim2.new(1,0,0,73),C.surface,.66)
+    card.LayoutOrder=order; round(card,7); stroke(card,.70)
+    label(card,name,UDim2.fromOffset(12,9),UDim2.new(1,-24,0,20),13,C.text,Enum.Font.GothamBold)
+    local desc=label(card,body,UDim2.fromOffset(12,32),UDim2.new(1,-24,0,31),12,C.muted)
+    desc.TextWrapped=true; desc.TextTruncate=Enum.TextTruncate.None
+    desc.TextYAlignment=Enum.TextYAlignment.Top
+    return card
+end
+section(nav,"GENERAL",1)
+local home,homeTab=addTab("Home","Welcome to Dulcan Hub.",2)
+local versionCard=frame(home,"VersionCard",UDim2.fromOffset(0,0),UDim2.new(1,0,0,89),C.surface,.66)
+versionCard.LayoutOrder=2; round(versionCard,7); stroke(versionCard,.62)
+label(versionCard,"CURRENT VERSION",UDim2.fromOffset(13,9),UDim2.new(1,-26,0,17),10,C.muted)
+label(versionCard,VERSION,UDim2.fromOffset(13,26),UDim2.new(1,-26,0,34),27,C.accent,Enum.Font.GothamBold)
+label(versionCard,"Universal Interface",UDim2.fromOffset(13,63),UDim2.new(1,-26,0,16),11,C.text)
+infoCard(home,"Official repository","thedulcandesign / DULCAN-HUB",3)
+local components=addTab("Components","Interface components.",3)
+infoCard(components,"Coming soon","This page is reserved for interface components.",2)
+local settings=addTab("Settings","Interface preferences.",4)
+infoCard(settings,"Coming soon","Interface settings will be added in a future update.",2)
+local about=addTab("About","Information about Dulcan Hub.",5)
+infoCard(about,"Dulcan Hub","Universal Interface  |  v"..VERSION,2)
+infoCard(about,"Developer","Dulcan Design",3)
+selectTab(homeTab)
 
 -- Compact independent status bar (actual measured values).
 local bar=frame(root,"StatusBar",UDim2.new(1,-12,0,12),UDim2.fromOffset(470,35),C.purple,.10)
