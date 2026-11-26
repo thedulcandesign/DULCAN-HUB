@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8.2 | LocalScript | standalone UI
-local VERSION = "2.8.2"
+-- DULCAN HUB V2.8.3 | LocalScript | standalone UI
+local VERSION = "2.8.3"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -17,8 +17,8 @@ local C = {
     accent = Color3.fromRGB(200,143,255), text = Color3.fromRGB(247,245,250),
     muted = Color3.fromRGB(154,148,169)
 }
--- Inter is a visual approximation of the reference; Axon font is not verified.
-local UI_FONT_FAMILY = "rbxassetid://12187365364"
+-- Typography follows the public Fluent reference (not a verified Axon font).
+local UI_FONT_FAMILY = "rbxasset://fonts/families/GothamSSm.json"
 local UI_FONTS = {
     Regular = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Regular, Enum.FontStyle.Normal),
     Medium = Font.new(UI_FONT_FAMILY, Enum.FontWeight.Medium, Enum.FontStyle.Normal),
@@ -304,8 +304,8 @@ local selected=make("TextButton",nav,{Name="Settings",Size=UDim2.new(1,-2,0,35),
 round(selected,6); stroke(selected,.72)
 local gear=label(selected,"⚙",UDim2.fromOffset(11,0),UDim2.fromOffset(24,35),19,C.accent)
 gear.Font=Enum.Font.BuilderSans
-label(selected,"Settings",UDim2.fromOffset(40,0),UDim2.new(1,-45,1,0),14,C.text,UI_FONTS.Medium)
-local heading=label(header,"Settings",UDim2.fromOffset(242,6),UDim2.new(1,-390,0,48),15,C.text,UI_FONTS.Medium)
+label(selected,"Settings",UDim2.fromOffset(40,0),UDim2.new(1,-45,1,0),12,C.text,UI_FONTS.Regular)
+local heading=label(header,"Settings",UDim2.fromOffset(242,6),UDim2.new(1,-390,0,48),13,C.text,UI_FONTS.Medium)
 heading.ZIndex=2
 content.ClipsDescendants=true
 local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromScale(1,1),
@@ -314,7 +314,7 @@ local scroll=make("ScrollingFrame",content,{Name="SettingsPage",Size=UDim2.fromS
 local function panel(name,height)
     local p=frame(scroll,name,UDim2.fromOffset(0,0),UDim2.fromOffset(250,height),C.surface,.72)
     round(p,7); stroke(p,.65)
-    label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),13,C.text,UI_FONTS.SemiBold)
+    label(p,name,UDim2.fromOffset(13,8),UDim2.new(1,-26,0,22),12,C.text,UI_FONTS.Medium)
     return p
 end
 local performance=panel("Performance",201)
@@ -347,7 +347,7 @@ on(scroll:GetPropertyChangedSignal("AbsoluteSize"),layoutPanels)
 layoutPanels()
 local function row(p,name,y)
     local r=frame(p,name,UDim2.fromOffset(10,y),UDim2.new(1,-20,0,35),C.dark,1)
-    label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),13,C.text)
+    label(r,name,UDim2.fromOffset(3,0),UDim2.new(1,-54,1,0),12,C.text,UI_FONTS.Regular)
     return r
 end
 local function toggle(p,name,y,callback)
