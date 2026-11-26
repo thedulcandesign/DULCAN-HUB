@@ -1,5 +1,5 @@
--- DULCAN HUB V2.8.6 | LocalScript | standalone UI
-local VERSION = "2.8.6"
+-- DULCAN HUB V2.8.7 | LocalScript | standalone UI
+local VERSION = "2.8.7"
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -463,46 +463,58 @@ label(unload,"Unload Hub",UDim2.fromOffset(5,0),UDim2.new(1,-35,1,0),12,C.text)
 local arrow=label(unload,"›",UDim2.new(1,-22,0,0),UDim2.fromOffset(16,30),18,C.muted)
 on(unload.Activated,function() gui:Destroy() end)
 
--- Status bar: independent, centered columns with explicit spacing.
-local BAR_WIDTH=570
-local BAR_HEIGHT=35
-local bar=frame(root,"StatusBar",UDim2.new(1,-12-BAR_WIDTH,0,12),UDim2.fromOffset(BAR_WIDTH,BAR_HEIGHT),C.purple,.10)
-bar.AnchorPoint=Vector2.new(0,0); round(bar,7); stroke(bar,.55)
+-- Compact status bar inspired by the visual reference.
+-- Every group has its own space; the logo cannot overlap the FPS label.
+local BAR_WIDTH=480
+local BAR_HEIGHT=36
+local bar=frame(root,"StatusBar",UDim2.new(1,-12-BAR_WIDTH,0,12),UDim2.fromOffset(BAR_WIDTH,BAR_HEIGHT),Color3.fromRGB(22,23,29),.13)
+bar.AnchorPoint=Vector2.new(0,0); round(bar,7); stroke(bar,.67)
 local barScale=make("UIScale",bar,{Scale=1})
-make("UIGradient",bar,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(145,135,157)),Rotation=90})
--- Column boundaries: logo 0-44, FPS 44-128, ping 128-200,
--- profile 200-326, experience 326-532, eye 532-570.
-local fallbackBarLogo=logo(bar,10,5,24)
-local barOK,barLogo=pcall(rasterLogo,bar,"OfficialEmblem",UDim2.fromOffset(8,4),UDim2.fromOffset(28,27),true)
-local function centeredBarLabel(name,txt,x,width,px,color)
-    local l=label(bar,txt,UDim2.fromOffset(x,0),UDim2.fromOffset(width,BAR_HEIGHT),px,color)
+make("UIGradient",bar,{Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(190,185,200)),Rotation=90})
+local barRegular=Font.new(UI_FONT_FAMILY,Enum.FontWeight.Regular,Enum.FontStyle.Normal)
+local barMedium=Font.new(UI_FONT_FAMILY,Enum.FontWeight.Medium,Enum.FontStyle.Normal)
+local fallbackBarLogo=logo(bar,9,8,20)
+local barOK,barLogo=pcall(rasterLogo,bar,"OfficialEmblem",UDim2.fromOffset(8,8),UDim2.fromOffset(22,20),true)
+local function barLabel(name,txt,x,width,color)
+    local l=label(bar,txt,UDim2.fromOffset(x,0),UDim2.fromOffset(width,BAR_HEIGHT),11,color,barRegular)
     l.Name=name
     l.TextXAlignment=Enum.TextXAlignment.Center
     l.TextYAlignment=Enum.TextYAlignment.Center
     l.TextScaled=false
     return l
 end
-local fps=centeredBarLabel("FPS","— FPS",47,78,12,C.text)
+local fps=barLabel("FPS","— FPS",34,59,C.muted)
+fps.RichText=true
+fps.FontFace=barMedium
 fps.TextTruncate=Enum.TextTruncate.None
-local ping=centeredBarLabel("Ping","— ms",131,66,11,C.muted)
+local ping=barLabel("Ping","— ms",100,51,C.muted)
+ping.RichText=true
+ping.FontFace=barMedium
 ping.TextTruncate=Enum.TextTruncate.None
 local function separator(x)
-    local line=frame(bar,"Separator",UDim2.fromOffset(x,BAR_HEIGHT/2),UDim2.fromOffset(1,17),C.border,.65)
+    local line=frame(bar,"Separator",UDim2.fromOffset(x,BAR_HEIGHT/2),UDim2.fromOffset(1,15),C.border,.75)
     line.AnchorPoint=Vector2.new(.5,.5)
 end
-separator(128); separator(200); separator(326); separator(532)
-local smallAvatar=make("ImageLabel",bar,{Position=UDim2.fromOffset(210,17.5),AnchorPoint=Vector2.new(0,.5),Size=UDim2.fromOffset(17,17),
-    BackgroundColor3=C.surface,BackgroundTransparency=.25,BorderSizePixel=0,ScaleType=Enum.ScaleType.Crop})
-round(smallAvatar,4)
-local barUser=centeredBarLabel("Username","@"..player.Name,232,87,10,C.muted)
-local experience=centeredBarLabel("Experience",game.Name,333,192,11,C.muted)
-local eye=button(bar,"ToggleWindow","",UDim2.fromOffset(537,4),UDim2.fromOffset(28,27))
-local eyeShape=frame(eye,"Eye",UDim2.fromScale(.5,.5),UDim2.fromOffset(18,10),C.dark,1)
+separator(96); separator(155); separator(263)
+local smallAvatar=make("ImageLabel",bar,{Position=UDim2.fromOffset(164,18),AnchorPoint=Vector2.new(0,.5),Size=UDim2.fromOffset(18,18),
+    BackgroundColor3=C.surface,BackgroundTransparency=.38,BorderSizePixel=0,ScaleType=Enum.ScaleType.Crop})
+round(smallAvatar,4); stroke(smallAvatar,.78)
+local barUser=barLabel("Username","@"..player.Name,188,70,C.muted)
+barUser.TextSize=10
+barUser.TextXAlignment=Enum.TextXAlignment.Left
+local experience=barLabel("Experience",game.Name,273,165,C.muted)
+experience.TextXAlignment=Enum.TextXAlignment.Left
+local eye=make("TextButton",bar,{Name="ToggleWindow",Position=UDim2.fromOffset(446,4),Size=UDim2.fromOffset(29,28),
+    BackgroundColor3=C.surface,BackgroundTransparency=.57,Text="",BorderSizePixel=0,AutoButtonColor=false})
+round(eye,5); stroke(eye,.71)
+on(eye.MouseEnter,function() tween(eye,{BackgroundTransparency=.24},.12) end)
+on(eye.MouseLeave,function() tween(eye,{BackgroundTransparency=.57},.12) end)
+local eyeShape=frame(eye,"Eye",UDim2.fromScale(.5,.5),UDim2.fromOffset(14,8),C.dark,1)
 eyeShape.AnchorPoint=Vector2.new(.5,.5)
-round(eyeShape,8); stroke(eyeShape,.22)
-local pupil=frame(eyeShape,"Pupil",UDim2.fromScale(.5,.5),UDim2.fromOffset(5,5),C.muted,0)
+round(eyeShape,8); stroke(eyeShape,.16)
+local pupil=frame(eyeShape,"Pupil",UDim2.fromScale(.5,.5),UDim2.fromOffset(4,4),C.muted,0)
 pupil.AnchorPoint=Vector2.new(.5,.5); round(pupil,5)
-local slash=frame(eye,"Hidden",UDim2.fromScale(.5,.5),UDim2.fromOffset(19,1.5),C.accent,0)
+local slash=frame(eye,"Hidden",UDim2.fromScale(.5,.5),UDim2.fromOffset(16,1),C.accent,0)
 slash.AnchorPoint=Vector2.new(.5,.5); slash.Rotation=-40; slash.Visible=false
 
 -- The native raster is synchronous; retain the geometric fallback only on error.
@@ -614,10 +626,10 @@ local frames,elapsed=0,0
 on(RunService.RenderStepped,function(dt)
     frames+=1; elapsed+=dt
     if elapsed<.5 then return end
-    fps.Text=string.format("%d FPS",math.floor(frames/elapsed+.5))
+    fps.Text=string.format('<font color="#F3F0FA">%d</font> FPS',math.floor(frames/elapsed+.5))
     frames,elapsed=0,0
     local ok,value=pcall(function() return Stats.Network.ServerStatsItem["Data Ping"]:GetValue() end)
-    ping.Text=ok and type(value)=="number" and string.format("%d ms",math.floor(value+.5)) or "— ms"
+    ping.Text=ok and type(value)=="number" and string.format('<font color="#F3F0FA">%d</font> ms',math.floor(value+.5)) or "— ms"
 end)
 setOpen(true)
 print("[Dulcan Hub] v"..VERSION.." | UI ready")
